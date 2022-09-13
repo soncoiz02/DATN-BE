@@ -1,21 +1,39 @@
 import mongoose, { Schema } from "mongoose";
+
 // const { ObjectId } = mongoose.Types;
 
 const serviceSchema = new Schema({
-    name: {
+    Name: {
         type: String,
-        required: true,
-        minlength: 5,
-        maxlength: 200,
+        required: true
     },
-    description: {
+    Desc: {
         type: String,
+        required: true
 
     },
-    // system_id: {
+    Price: {
+        type: Number,
+        required: true
+
+    },
+    Image: {
+        type: String,
+        required: true
+
+    },
+    Duration: {
+        type: Number,
+        required: true
+
+    },
+    Status: {
+        type: Number,
+        required: true
+    },
+    // Store_id: {
     //     type: ObjectId,
-    //     ref: "System",
-    //     required: true
+    //     ref: "Store",
     // },
 
 }, { timestamps: true });
