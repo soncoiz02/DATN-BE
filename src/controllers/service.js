@@ -5,10 +5,9 @@ export const create = (req, res) => {
 
     try {
         const service = new Service(req.body).save();
-        res.json(service);
-        return;
+        return res.json(service);
     } catch (error) {
-        res.status(400).json({
+        return res.status(400).json({
             message: "Thêm dịch vụ không thành công",
         })
     }
@@ -17,9 +16,9 @@ export const create = (req, res) => {
 export const list = async(req, res) => {
     try {
         const service = await Service.find({}).exec();
-        res.json(service);
+        return res.json(service);
     } catch (error) {
-        res.status(400).json({
+        return res.status(400).json({
             message: "không hiển thị được danh sách sản phẩm",
         })
     }
@@ -28,9 +27,9 @@ export const list = async(req, res) => {
 export const remove = async(req, res) => {
     try {
         const service = await Service.findOneAndDelete({ _id: req.params.id }).exec();
-        res.json(service);
+        return res.json(service);
     } catch (error) {
-        res.status(400).json({
+        return res.status(400).json({
             message: "xóa sản phẩm không thành công",
         })
     }
@@ -39,9 +38,9 @@ export const remove = async(req, res) => {
 export const update = async(req, res) => {
     try {
         const service = await Service.findOneAndUpdate({ _id: req.params.id }, req.body).exec();
-        res.json(service);
+        return res.json(service);
     } catch (error) {
-        res.status(400).json({
+        return res.status(400).json({
             message: "sửa sản phẩm không thành công",
         })
     }
@@ -52,9 +51,9 @@ export const update = async(req, res) => {
 export const read = async(req, res) => {
     try {
         const service = await Service.findOne({ _id: req.params.id }).exec();
-        res.json(service);
+        return res.json(service);
     } catch (error) {
-        res.status(400).json({
+        return res.status(400).json({
             message: "Không tìm được dịch vụ",
         })
     }
