@@ -3,12 +3,14 @@ import http from 'http';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import mongoose from 'mongoose';
+import storeRouter from './routers/store'
 
 const app = express();
 const server = http.createServer(app);
 dotenv.config();
 app.use(cors());
 app.use(express.json());
+app.use('/api',storeRouter)
 
 mongoose.connect(process.env.MONGODB_URI).then(() =>
     console.log('Database connected')
