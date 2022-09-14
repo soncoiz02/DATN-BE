@@ -1,4 +1,4 @@
-import mongoose, { Schema, ObjectId, } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 const categoryServiece = new Schema({
     name: {

@@ -1,4 +1,4 @@
-import Category from '../model/category'
+import Category from '../models/category'
 // eslint-disable-next-line import/prefer-default-export
 export const create = async (request, response) => {
     try {
@@ -57,3 +57,4 @@ export const update = async (request, response) => {
         })
     }
 }
+
