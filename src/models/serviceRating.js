@@ -10,11 +10,17 @@ const serviceRating = new Schema({
         required: true
 
     },
-    // user_id: {
-    //     type: ObjectId,
-    //     ref: "User",
-    // },
-    service_id: {
+    slug: {
+        type: String,
+        lowercase: true,
+        unique: true,
+        index: true
+    },
+    userId: {
+        type: ObjectId,
+        ref: "User",
+    },
+    serviceId: {
         type: ObjectId,
         ref: "Store",
     },
