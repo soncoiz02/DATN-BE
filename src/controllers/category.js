@@ -9,7 +9,7 @@ export const create = async (request, response) => {
         response.json(category)
     } catch (error) {
         response.status(400).json({
-            message: error.message('Không thêm được danh mục')
+            message: error.message
         })
     }
 }
@@ -19,7 +19,7 @@ export const list = async (request, response) => {
         response.json(category);
     } catch (error) {
         response.status(400).json({
-            message: error.message('Không tìm thấy danh mục')
+            message: error.message
         })
     }
 }
@@ -33,7 +33,7 @@ export const read = async (request, response) => {
         })
     } catch (error) {
         response.status(400).json({
-            message: error.message('Không tìm thấy danh mục')
+            message: error.message
         })
     }
 }
@@ -44,7 +44,7 @@ export const remove = async (request, response) => {
         response.json(category)
     } catch (error) {
         response.status(400).json({
-            message: error.message('Xóa danh mục thất bại')
+            message: error.message
         })
     }
 }
@@ -58,7 +58,7 @@ export const update = async (request, response) => {
         response.json(category)
     } catch (error) {
         response.status(400).json({
-            message: error.message("Cập nhật danh mục thất bại")
+            message: error.message
         })
     }
 }
