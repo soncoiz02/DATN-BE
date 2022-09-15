@@ -18,7 +18,7 @@ export const listStore = async (request,response)=>{
         response.status(400).json({message:error.message})
     }
 }
-export const listStoreDetail = async (request,response)=>{
+export const storeDetail = async (request,response)=>{
     try {
         const store = await Store.findOne({_id:request.params.id}).exec()
         response.json(store);
