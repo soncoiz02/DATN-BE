@@ -1,6 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 
-// const { ObjectId } = mongoose.Types;
+const { ObjectId } = mongoose.Types;
 
 const serviceSchema = new Schema({
     Name: {
@@ -31,10 +31,10 @@ const serviceSchema = new Schema({
         type: Number,
         required: true
     },
-    // Store_id: {
-    //     type: ObjectId,
-    //     ref: "Store",
-    // },
+    Store_id: {
+        type: ObjectId,
+        ref: "Store",
+    },
 
 }, { timestamps: true });
 

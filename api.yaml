@@ -8,7 +8,6 @@ info:
 # Service
 
 paths:
-tags:
   /api/Service:
     get:
       summary: Lấy danh sách Dịch vụ
@@ -127,7 +126,8 @@ components:
           type: integer
         Status:
           type: integer
-
+        Store_id:
+          type: string
 
       #   system_id:
       #     type: string
@@ -138,6 +138,7 @@ components:
         - Image
         - Duration
         - Status
+        - Store_id
 
 
 # End Service
