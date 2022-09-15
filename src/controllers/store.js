@@ -6,7 +6,7 @@ export const createStore = async (request,response)=>{
         const store = await new Store(request.body).save()
         response.json(store)
     } catch (error) {
-        response.status(400).json({message:"Không thể thêm cửa hàng"})
+        response.status(400).json({message:error.message})
         console.log(error);
     }
 }
@@ -15,7 +15,7 @@ export const listStore = async (request,response)=>{
         const store = await Store.find({}).exec()
         response.json(store);
     } catch (error) {
-        response.status(400).json({message:"Không hiển thị được cửa hàng"})
+        response.status(400).json({message:error.message})
     }
 }
 export const listStoreDetail = async (request,response)=>{
@@ -23,7 +23,7 @@ export const listStoreDetail = async (request,response)=>{
         const store = await Store.findOne({_id:request.params.id}).exec()
         response.json(store);
     } catch (error) {
-        response.status(400).json({message:"Không tìm thấy data"})
+        response.status(400).json({message:error.message})
     }
 }
 export const deleteStore = async (request,response)=>{
@@ -31,7 +31,7 @@ export const deleteStore = async (request,response)=>{
         const store = await Store.findOneAndDelete({_id:request.params.id}).exec()
         response.json(store);
     } catch (error) {
-        response.status(400).json({message:"Không thể xóa cửa hàng"})
+        response.status(400).json({message:error.message})
         
     }
 }
@@ -41,6 +41,6 @@ export const updateStore = async (request,response)=>{
         const store = await Store.findOneAndUpdate({id:request.params.id}, request.body, option).exec()
         response.json(store);
     } catch (error) {
-        response.status(400).json({message:"Không cập nhật được"})   
+        response.status(400).json({message:error.message})   
     }
 }

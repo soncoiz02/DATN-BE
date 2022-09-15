@@ -3,7 +3,7 @@ import http from 'http';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import mongoose from 'mongoose';
-import storeRouter from './routers/store'
+import storeRouter from './routes/store'
 
 const app = express();
 const server = http.createServer(app);
