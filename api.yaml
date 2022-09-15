@@ -4,9 +4,11 @@ info:
   version: 1.0.1
   title: "by truong"
 
+
 # Service
 
 paths:
+tags:
   /api/Service:
     get:
       summary: Lấy danh sách Dịch vụ
@@ -27,6 +29,9 @@ paths:
         required: true
         schema: 
           $ref: "#/components/schemas/Service"
+
+
+
 
 
   /api/Service/{id}:
@@ -78,23 +83,31 @@ paths:
           description: Không tìm thấy dịch vụ
 
     delete:
-      summary: xóa sản phẩm theo id
+      summary: "xóa sản phẩm theo id"
+      description: ""
+      operationId: ""
+      produces:
+      - "application/xml"
+      - "application/json"
       parameters:
       - in: path
         name: id
         schema:
           type: string
         required: true
-        description:
+        description: The book id
       responses:
-      200:
-        description: Xóa dịch vụ thành công
-        contens:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Service'
-      404:
-        description: Xóa dịch vụ thất bại
+        "400":
+          description: "Invalid ID supplied"
+        "404":
+          description: "Pet not found"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+
+
+
 
 
 # Models
@@ -102,8 +115,6 @@ components:
   schemas:
     Service:
       properties:
-        _id:
-          type: integer
         Name:
           type: string
         Desc:

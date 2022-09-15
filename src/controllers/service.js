@@ -8,7 +8,7 @@ export const create = (req, res) => {
         return res.json(service);
     } catch (error) {
         return res.status(400).json({
-            message: "Thêm dịch vụ không thành công",
+            message: error.message,
         })
     }
 }
@@ -19,7 +19,7 @@ export const list = async(req, res) => {
         return res.json(service);
     } catch (error) {
         return res.status(400).json({
-            message: "không hiển thị được danh sách sản phẩm",
+            message: error.message,
         })
     }
 }
@@ -30,7 +30,7 @@ export const remove = async(req, res) => {
         return res.json(service);
     } catch (error) {
         return res.status(400).json({
-            message: "xóa sản phẩm không thành công",
+            message: error.message,
         })
     }
 }
@@ -41,7 +41,7 @@ export const update = async(req, res) => {
         return res.json(service);
     } catch (error) {
         return res.status(400).json({
-            message: "sửa sản phẩm không thành công",
+            message: error.message,
         })
     }
 }
@@ -54,7 +54,7 @@ export const read = async(req, res) => {
         return res.json(service);
     } catch (error) {
         return res.status(400).json({
-            message: "Không tìm được dịch vụ",
+            message: error.message,
         })
     }
 }
