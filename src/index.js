@@ -1,13 +1,13 @@
+import swaggerUI from 'swagger-ui-express';
+import YAML from 'yamljs';
+
 import express from 'express';
 import http from 'http';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import mongoose from 'mongoose';
-import storeRouter from './routes/store'
 
-import swaggerUI from 'swagger-ui-express';
-import YAML from 'yamljs';
-
+import storeRouter from './routes/store';
 import categoryRouter from './routes/category';
 import ServiceRoute from './routes/service';
 
@@ -19,7 +19,7 @@ dotenv.config();
 app.use(cors());
 app.use(express.json());
 
-app.use('/api',storeRouter)
+app.use('/api', storeRouter);
 app.use('/api', categoryRouter);
 
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerJSDocs));
