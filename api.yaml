@@ -1,0 +1,147 @@
+swagger: "2.0"
+info:
+  description: Mô tả về API...
+  version: 1.0.1
+  title: "by truong"
+
+
+# Service
+
+paths:
+  /api/Service:
+    get:
+      summary: Lấy danh sách Dịch vụ
+      responses: 
+        "200":
+          description: Lấy danh sách Dịch vụ thành công
+        "400":
+          description: Không lấy được danh sách Dịch vụ
+    post:
+      summary: Thêm Dịch vụ
+      responses:
+        "200":
+          description: Thêm danh sách Dịch vụ thành công
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Bắt buộc phải có các trường giống bên dưới"
+        required: true
+        schema: 
+          $ref: "#/components/schemas/Service"
+
+
+
+
+
+  /api/Service/{id}:
+    get:
+      summary: Tìm Dịch vụ theo id
+          tags: [Find service]
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+      responses:
+        '200':
+          description: tìm Dịch vụ thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Service'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Service'
+        '400':
+          description: id không hợp lệ
+        '404':
+          description: Không tìm thấy dịch vụ
+    put:
+      summary: " update dịch vụ"
+      description: ""
+      operationId: "updateService"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "điền id dịch vụ cần cập nhật"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        description: "cập nhật theo các trường dưới đây"
+        required: true
+        schema:
+          $ref: '#/components/schemas/Service'
+      responses:
+        '400':
+          description: id không hợp lệ
+        '404':
+          description: Không tìm thấy dịch vụ
+
+    delete:
+      summary: "xóa sản phẩm theo id"
+      description: ""
+      operationId: ""
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+        description: The book id
+      responses:
+        "400":
+          description: "Invalid ID supplied"
+        "404":
+          description: "Pet not found"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+
+
+
+
+
+# Models
+components:
+  schemas:
+    Service:
+      properties:
+        name:
+          type: string
+        desc:
+          type: string
+        price:
+          type: integer
+        image:
+          type: string
+        duration:
+          type: integer
+        status:
+          type: integer
+        store_id:
+          type: string
+
+      #   system_id:
+      #     type: string
+      required:
+        - name
+        - desc
+        - price
+        - image
+        - duration
+        - status
+        - store_id
+
+
+# End Service
+
+
+ 
