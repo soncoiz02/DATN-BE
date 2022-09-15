@@ -28,10 +28,6 @@ const storeSchema = new Schema({
     visiter:{
         type:Number,
         required:true,
-    },
-    category:{
-        type:ObjectId,
-        ref:'category'
     }
 },{timestamps:true})
 
