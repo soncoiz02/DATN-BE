@@ -3,35 +3,35 @@ import mongoose, { Schema } from "mongoose";
 const { ObjectId } = mongoose.Types;
 
 const serviceSchema = new Schema({
-    Name: {
+    name: {
         type: String,
         required: true
     },
-    Desc: {
-        type: String,
-        required: true
-
-    },
-    Price: {
-        type: Number,
-        required: true
-
-    },
-    Image: {
+    desc: {
         type: String,
         required: true
 
     },
-    Duration: {
+    price: {
         type: Number,
         required: true
 
     },
-    Status: {
+    image: {
+        type: String,
+        required: true
+
+    },
+    duration: {
+        type: Number,
+        required: true
+
+    },
+    status: {
         type: Number,
         required: true
     },
-    Store_id: {
+    store_id: {
         type: ObjectId,
         ref: "Store",
     },

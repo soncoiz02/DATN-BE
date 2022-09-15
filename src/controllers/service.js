@@ -8,7 +8,7 @@ export const create = (req, res) => {
         return res.json(service);
     } catch (error) {
         return res.status(400).json({
-            message: error.message("tạo mới được dịch vụ không thành công")
+            message: error.message,
         })
     }
 }
@@ -19,7 +19,7 @@ export const list = async(req, res) => {
         return res.json(service);
     } catch (error) {
         return res.status(400).json({
-            message: error.message("Không hiển thị được dịch vụ")
+            message: error.message,
         })
     }
 }
@@ -30,7 +30,7 @@ export const remove = async(req, res) => {
         return res.json(service);
     } catch (error) {
         return res.status(400).json({
-            message: error.message("xóa dịch vụ không thành công")
+            message: error.message,
         })
     }
 }
@@ -41,7 +41,7 @@ export const update = async(req, res) => {
         return res.json(service);
     } catch (error) {
         return res.status(400).json({
-            message: error.message("Không cập nhật được dịch vụ")
+            message: error.message,
         })
     }
 }
@@ -54,7 +54,7 @@ export const read = async(req, res) => {
         return res.json(service);
     } catch (error) {
         return res.status(400).json({
-            message: error.message("Không tìm được dịch vụ")
+            message: error.message,
         })
     }
 }

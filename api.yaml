@@ -114,31 +114,31 @@ components:
   schemas:
     Service:
       properties:
-        Name:
+        name:
           type: string
-        Desc:
+        desc:
           type: string
-        Price:
+        price:
           type: integer
-        Image:
+        image:
           type: string
-        Duration:
+        duration:
           type: integer
-        Status:
+        status:
           type: integer
-        Store_id:
+        store_id:
           type: string
 
       #   system_id:
       #     type: string
       required:
-        - Name
-        - Desc
-        - Price
-        - Image
-        - Duration
-        - Status
-        - Store_id
+        - name
+        - desc
+        - price
+        - image
+        - duration
+        - status
+        - store_id
 
 
 # End Service
