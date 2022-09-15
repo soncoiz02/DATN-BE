@@ -1,9 +1,10 @@
 import ServiceRating from "../models/serviceRating";
 
 // eslint-disable-next-line import/prefer-default-export
-export const createServeRating = (req, res) => {
+export const createServeRating = async (req, res) => {
     try {
-        const serviceRating = new ServiceRating(req.body).save();
+        const serviceRating = await new ServiceRating(req.body).save();
+        console.log(serviceRating)
         res.json(serviceRating);
     } catch (error) {
         res.status(400).json({
@@ -35,10 +36,14 @@ export const removeServeRating = async(req, res) => {
 }
 
 export const updateServeRating = async(req, res) => {
+    const option = {
+        new: true,
+    }
     try {
-        const serviceRating = await ServiceRating.findOneAndUpdate({ _id: req.params.id }, req.body).exec();
+        const serviceRating = await ServiceRating.findOneAndUpdate({ _id: req.params.id }, req.body, option).exec();
         res.json(serviceRating);
     } catch (error) {
+        console.log(error)
         res.status(400).json({
             message: "Sửa đánh giá dịch vụ không thành công",
         })
