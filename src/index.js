@@ -3,6 +3,7 @@ import http from 'http';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import mongoose from 'mongoose';
+import categoryRouter from './routes/category'
 
 import swaggerUI from 'swagger-ui-express';
 import YAML from 'yamljs';
@@ -15,6 +16,9 @@ const server = http.createServer(app);
 dotenv.config();
 app.use(cors());
 app.use(express.json());
+app.use('/api', categoryRouter)
+
+
 
 
 
