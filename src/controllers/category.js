@@ -25,13 +25,13 @@ export const list = async (request, response) => {
 }
 export const read = async (request, response) => {
     const condition = { _id: request.params.id }
-    request.body.slug = slugify(request.body.name)
     try {
         const category = await Category.findOne(condition).exec();
         response.json({
             category,
         })
     } catch (error) {
+        console.log(error)
         response.status(400).json({
             message: error.message
         })
