@@ -4,7 +4,6 @@ import ServiceRating from "../models/serviceRating";
 
 // eslint-disable-next-line import/prefer-default-export
 export const createServeRating = async (req, res) => {
-    req.body.slug = slugify(req.body.name)
     try {
         const serviceRating = await new ServiceRating(req.body).save();
         console.log(serviceRating)
@@ -39,7 +38,6 @@ export const removeServeRating = async (req, res) => {
 }
 
 export const updateServeRating = async (req, res) => {
-    req.body.slug = slugify(req.body.name)
     const option = {
         new: true,
     }
