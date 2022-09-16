@@ -9,6 +9,7 @@ import YAML from 'yamljs';
 
 import categoryRouter from './routes/category';
 import ServiceRoute from './routes/service';
+import PostRoute from './routes/post';
 
 const app = express();
 const swaggerJSDocs = YAML.load('./api.yaml');
@@ -18,9 +19,9 @@ dotenv.config();
 app.use(cors());
 app.use(express.json());
 app.use('/api', categoryRouter);
-
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerJSDocs));
 app.use('/api', ServiceRoute);
+app.use('/api', PostRoute);
 
 mongoose
   .connect(process.env.MONGODB_URI)
