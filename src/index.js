@@ -6,6 +6,7 @@ import http from 'http';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import mongoose from 'mongoose';
+import serviceRatingRouter from './routes/serviceRating';
 
 import storeRouter from './routes/store';
 import categoryRouter from './routes/category';
@@ -19,6 +20,7 @@ const server = http.createServer(app);
 dotenv.config();
 app.use(cors());
 app.use(express.json());
+app.use('/api', serviceRatingRouter);
 
 app.use('/api', storeRouter);
 app.use('/api', categoryRouter);
