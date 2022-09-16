@@ -10,6 +10,7 @@ import mongoose from 'mongoose';
 import storeRouter from './routes/store';
 import categoryRouter from './routes/category';
 import ServiceRoute from './routes/service';
+import orderStatusRoute from './routes/orderStatus';
 
 const app = express();
 const swaggerJSDocs = YAML.load('./api.yaml');
@@ -21,7 +22,7 @@ app.use(express.json());
 
 app.use('/api', storeRouter);
 app.use('/api', categoryRouter);
-
+app.use('/api', orderStatusRoute);
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerJSDocs));
 app.use('/api', ServiceRoute);
 
