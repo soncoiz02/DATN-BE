@@ -7,15 +7,19 @@ const userSchema = new mongoose.Schema(
     username: {
       type: String,
       maxLength: 20,
+      required: true,
     },
     name: {
       type: String,
+      required: true,
     },
     birthday: {
       type: Date,
+      required: true,
     },
     phone: {
       type: Number,
+      required: true,
     },
     email: {
       type: String,
