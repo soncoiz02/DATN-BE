@@ -9,6 +9,7 @@ import YAML from 'yamljs';
 
 import categoryRouter from './routes/category';
 import ServiceRoute from './routes/service';
+import authRouter from './routes/auth';
 
 const app = express();
 const swaggerJSDocs = YAML.load('./api.yaml');
@@ -21,6 +22,7 @@ app.use('/api', categoryRouter);
 
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerJSDocs));
 app.use('/api', ServiceRoute);
+app.use('/api', authRouter);
 
 mongoose
   .connect(process.env.MONGODB_URI)
