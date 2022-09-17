@@ -13,6 +13,7 @@ import categoryRouter from './routes/category';
 import ServiceRoute from './routes/service';
 import PostRoute from './routes/post';
 import orderStatusRoute from './routes/orderStatus';
+import OrderRoute from './routes/order';
 
 const app = express();
 const swaggerJSDocs = YAML.load('./api.yaml');
@@ -28,7 +29,7 @@ app.use('/api', orderStatusRoute);
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerJSDocs));
 app.use('/api', ServiceRoute);
 app.use('/api', PostRoute);
-app.use('/api', );
+app.use("/api", OrderRoute)
 
 mongoose
     .connect(process.env.MONGODB_URI)
