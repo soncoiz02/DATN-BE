@@ -28,14 +28,15 @@ app.use('/api', orderStatusRoute);
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerJSDocs));
 app.use('/api', ServiceRoute);
 app.use('/api', PostRoute);
+app.use('/api', );
 
 mongoose
-  .connect(process.env.MONGODB_URI)
-  .then(() => console.log('Database connected'))
-  .catch(() => console.log('Connect database failed'));
+    .connect(process.env.MONGODB_URI)
+    .then(() => console.log('Database connected'))
+    .catch(() => console.log('Connect database failed'));
 
 const PORT = process.env.PORT || 3000;
 
 server.listen(PORT, () => {
-  console.log(`Server listening on port ${PORT}`);
+    console.log(`Server listening on port ${PORT}`);
 });
