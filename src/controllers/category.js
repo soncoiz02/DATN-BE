@@ -1,9 +1,7 @@
 import Category from '../models/category';
 // eslint-disable-next-line import/order
-import slugify from 'slugify';
 // eslint-disable-next-line import/prefer-default-export
 export const create = async (request, response) => {
-  request.body.slug = slugify(request.body.name);
   try {
     const category = await new Category(request.body).save();
     response.json(category);
@@ -50,7 +48,6 @@ export const remove = async (request, response) => {
 };
 export const update = async (request, response) => {
   const condition = { slug: request.params.slug };
-  request.body.slug = slugify(request.body.name);
   const document = request.body;
   const options = { new: true };
   try {
