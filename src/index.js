@@ -9,6 +9,7 @@ import YAML from 'yamljs';
 
 import categoryRouter from './routes/category';
 import ServiceRoute from './routes/service';
+import PostCommentRoute from './routes/postcomment';
 
 const app = express();
 const swaggerJSDocs = YAML.load('./api.yaml');
@@ -18,7 +19,7 @@ dotenv.config();
 app.use(cors());
 app.use(express.json());
 app.use('/api', categoryRouter);
-
+app.use('/api', PostCommentRoute);
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerJSDocs));
 app.use('/api', ServiceRoute);
 
