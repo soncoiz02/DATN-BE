@@ -1,9 +1,7 @@
-import slugify from 'slugify';
 import ServiceRating from '../models/serviceRating';
 
 // eslint-disable-next-line import/prefer-default-export
 export const createServeRating = async (req, res) => {
-  req.body.slug = slugify(req.body.name);
   try {
     const serviceRating = await new ServiceRating(req.body).save();
     console.log(serviceRating);
@@ -40,7 +38,6 @@ export const removeServeRating = async (req, res) => {
 };
 
 export const updateServeRating = async (req, res) => {
-  req.body.slug = slugify(req.body.name);
   const option = {
     new: true,
   };
@@ -65,6 +62,31 @@ export const readServeRating = async (req, res) => {
       _id: req.params.id,
     }).exec();
     res.json(serviceRating);
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+    });
+  }
+};
+
+export const getAllServiceRated = async (req, res) => {
+  try {
+    const { serviceId } = req.query;
+    const data = await ServiceRating.find({ serviceId }).exec();
+    const avgRated = (
+      data.reduce((prev, item) => prev + item.rate, 0) / data.length
+    ).toFixed(1);
+    const ratedNumbers = [5, 4, 3, 2, 1];
+    const detailRated = ratedNumbers.map((num) => ({
+      star: num,
+      count: data.filter((item) => Math.floor(item.rate) === num).length,
+    }));
+    res.json({
+      total: data.length,
+      list: data,
+      avgRated,
+      detailRated,
+    });
   } catch (error) {
     res.status(400).json({
       message: error.message,

@@ -14,6 +14,7 @@ import ServiceRoute from './routes/service';
 import PostRoute from './routes/post';
 import orderStatusRoute from './routes/orderStatus';
 import OrderRoute from './routes/order';
+import OrderStepRoute from './routes/serviceStep';
 
 const app = express();
 const swaggerJSDocs = YAML.load('./api.yaml');
@@ -30,14 +31,15 @@ app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerJSDocs));
 app.use('/api', ServiceRoute);
 app.use('/api', PostRoute);
 app.use("/api", OrderRoute)
+app.use('/api', OrderStepRoute);
 
 mongoose
-    .connect(process.env.MONGODB_URI)
-    .then(() => console.log('Database connected'))
-    .catch(() => console.log('Connect database failed'));
+  .connect(process.env.MONGODB_URI)
+  .then(() => console.log('Database connected'))
+  .catch(() => console.log('Connect database failed'));
 
 const PORT = process.env.PORT || 3000;
 
 server.listen(PORT, () => {
-    console.log(`Server listening on port ${PORT}`);
+  console.log(`Server listening on port ${PORT}`);
 });

@@ -1,4 +1,5 @@
-swagger: "2.0"
+
+ swagger: "2.0"
 info:
   description: Mô tả về API...
   version: 1.0.1
@@ -122,8 +123,11 @@ paths:
       - petstore_auth:
         - "write:pets"
         - "read:pets"
-# Order 
+# End Service -----------------------------------------------------------------------------------------------------------------------------
 
+
+
+# Order 
   /api/Order:
     get:
       tags:
@@ -148,7 +152,6 @@ paths:
         required: true
         schema: 
           $ref: "#/components/schemas/Order"
-
   /api/Order/{id}:
     get:
       tags:
@@ -225,51 +228,189 @@ paths:
       - petstore_auth:
         - "write:pets"
         - "read:pets"
-# Models
-components:
-  schemas:
-    Service:
-      properties:
-        name:
-          type: string
-        desc:
-          type: string
-        price:
-          type: integer
-        image:
-          type: string
-        duration:
-          type: integer
-        status:
-          type: integer
-        store_id:
-          type: string
-      required:
-        - name
-        - desc
-        - price
-        - image
-        - duration
-        - status
-        - store_id
-    Order:
-      properties:
-        dateStart:
-          type: string
-        infoUser:
-          type: string
-        status:
-          type: integer
-        user_id:
-          type: string
-        service_id:
-          type: string
 
-      required:
-        - dateStart
-        - infoUser
-        - status
-        - user_id
-        - service_id
 
- 
+#  End Order -----------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+# Service Step 
+
+  /api/service-step:
+    get:
+      tags:
+      - "ServiceStep"
+      summary: Lấy danh sách đặt dịch vụ
+      responses: 
+        "200":
+          description: Lấy danh sách đặt Dịch vụ thành công
+        "400":
+          description: Không lấy được danh sách đặt Dịch vụ      
+    post:
+      tags:
+      - "ServiceStep"    
+      summary: Thêm Dịch vụ
+      responses:
+        "200":
+          description: Thêm danh sách Dịch vụ thành công
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Bắt buộc phải có các trường giống bên dưới"
+        required: true
+        schema: 
+          $ref: "#/components/schemas/ServiceStep"
+
+  /api/service-step/{id}:
+    get:
+      tags:
+      - "ServiceStep"
+      summary: Tìm Dịch vụ theo id
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+      responses:
+        '200':
+          description: tìm Dịch vụ thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceStep'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ServiceStep'
+        '400':
+          description: id không hợp lệ
+        '404':
+          description: Không tìm thấy dịch vụ
+    put:
+      tags:
+      - "ServiceStep"
+      summary: " update dịch vụ"
+      description: ""
+      operationId: "updateServiceStep"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "điền id dịch vụ cần cập nhật"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        description: "cập nhật theo các trường dưới đây"
+        required: true
+        schema:
+          $ref: '#/components/schemas/ServiceStep'
+      responses:
+        '400':
+          description: id không hợp lệ
+        '404':
+          description: Không tìm thấy dịch vụ
+
+    delete:
+      tags:
+      - "ServiceStep"
+      summary: "xóa sản phẩm theo id"
+      description: ""
+      operationId: ""
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+        description: ""
+      responses:
+        "400":
+          description: "id không hợp lệ"
+        "404":
+          description: "Không tìm thấy dịch vụ"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /api/Order/{id}:
+    get:
+      tags:
+      - "Order"
+      summary: Tìm Dịch vụ theo id
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+      responses:
+        '200':
+          description: tìm Dịch vụ thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '400':
+          description: id không hợp lệ
+        '404':
+          description: Không tìm thấy dịch vụ
+    put:
+      tags:
+      - "Order"
+      summary: " update dịch vụ"
+      description: ""
+      operationId: "updateOrder"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "điền id dịch vụ cần cập nhật"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        description: "cập nhật theo các trường dưới đây"
+        required: true
+        schema:
+          $ref: '#/components/schemas/Order'
+      responses:
+        '400':
+          description: id không hợp lệ
+        '404':
+          description: Không tìm thấy dịch vụ
+    delete:
+      tags:
+      - "Order"
+      summary: "xóa sản phẩm theo id"
+      description: ""
+      operationId: ""
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+        description: ""
+      responses:
+        "400":
+          description: "id không hợp lệ"
+        "404":
+          description: "Không tìm thấy dịch vụ"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+#  End Service Step -----------------------------------------------------------------------------------------------------------------------------
