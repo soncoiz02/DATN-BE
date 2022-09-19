@@ -13,6 +13,7 @@ import categoryRouter from './routes/category';
 import ServiceRoute from './routes/service';
 import PostRoute from './routes/post';
 import orderStatusRoute from './routes/orderStatus';
+import OrderRoute from './routes/order';
 import OrderStepRoute from './routes/serviceStep';
 
 const app = express();
@@ -29,6 +30,7 @@ app.use('/api', orderStatusRoute);
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerJSDocs));
 app.use('/api', ServiceRoute);
 app.use('/api', PostRoute);
+app.use("/api", OrderRoute)
 app.use('/api', OrderStepRoute);
 
 mongoose
