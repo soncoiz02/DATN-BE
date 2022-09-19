@@ -16,7 +16,7 @@ const postCommentSchema = new Schema(
     },
     user_id: {
       type: ObjectId,
-      ref: 'Store',
+      ref: 'User',
     },
     post_id: {
       type: ObjectId,
