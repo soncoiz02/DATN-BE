@@ -1,10 +1,9 @@
-import Category from '../models/category';
-// eslint-disable-next-line import/order
+import Post from '../models/post';
 // eslint-disable-next-line import/prefer-default-export
 export const create = async (request, response) => {
   try {
-    const category = await new Category(request.body).save();
-    response.json(category);
+    const post = await new Post(request.body).save();
+    response.json(post);
   } catch (error) {
     response.status(400).json({
       message: error.message,
@@ -13,8 +12,8 @@ export const create = async (request, response) => {
 };
 export const list = async (request, response) => {
   try {
-    const category = await Category.find();
-    response.json(category);
+    const post = await Post.find();
+    response.json(post);
   } catch (error) {
     response.status(400).json({
       message: error.message,
@@ -24,10 +23,8 @@ export const list = async (request, response) => {
 export const read = async (request, response) => {
   const condition = { _id: request.params.id };
   try {
-    const category = await Category.findOne(condition).exec();
-    response.json({
-      category,
-    });
+    const post = await Post.findOne(condition).exec();
+    response.json(post);
   } catch (error) {
     console.log(error);
     response.status(400).json({
@@ -38,25 +35,26 @@ export const read = async (request, response) => {
 export const remove = async (request, response) => {
   const condition = { _id: request.params.id };
   try {
-    const category = await Category.findOneAndDelete(condition).exec();
-    response.json(category);
+    const post = await Post.findOneAndDelete(condition).exec();
+    response.json(post);
   } catch (error) {
     response.status(400).json({
       message: error.message,
     });
   }
 };
+
 export const update = async (request, response) => {
-  const condition = { slug: request.params.slug };
+  const condition = { _id: request.params.id };
   const document = request.body;
   const options = { new: true };
   try {
-    const category = await Category.findOneAndUpdate(
+    const post = await Post.findOneAndUpdate(
       condition,
       document,
       options
     ).exec();
-    response.json(category);
+    response.json(post);
   } catch (error) {
     response.status(400).json({
       message: error.message,

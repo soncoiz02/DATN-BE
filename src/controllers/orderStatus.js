@@ -1,10 +1,9 @@
-import Category from '../models/category';
-// eslint-disable-next-line import/order
+import OrderStatus from '../models/orderStatus';
 // eslint-disable-next-line import/prefer-default-export
 export const create = async (request, response) => {
   try {
-    const category = await new Category(request.body).save();
-    response.json(category);
+    const orderStatus = await new OrderStatus(request.body).save();
+    response.json(orderStatus);
   } catch (error) {
     response.status(400).json({
       message: error.message,
@@ -13,8 +12,8 @@ export const create = async (request, response) => {
 };
 export const list = async (request, response) => {
   try {
-    const category = await Category.find();
-    response.json(category);
+    const orderStatus = await OrderStatus.find();
+    response.json(orderStatus);
   } catch (error) {
     response.status(400).json({
       message: error.message,
@@ -24,10 +23,8 @@ export const list = async (request, response) => {
 export const read = async (request, response) => {
   const condition = { _id: request.params.id };
   try {
-    const category = await Category.findOne(condition).exec();
-    response.json({
-      category,
-    });
+    const orderStatus = await OrderStatus.findOne(condition).exec();
+    response.json(orderStatus);
   } catch (error) {
     console.log(error);
     response.status(400).json({
@@ -38,8 +35,8 @@ export const read = async (request, response) => {
 export const remove = async (request, response) => {
   const condition = { _id: request.params.id };
   try {
-    const category = await Category.findOneAndDelete(condition).exec();
-    response.json(category);
+    const orderStatus = await OrderStatus.findOneAndDelete(condition).exec();
+    response.json(orderStatus);
   } catch (error) {
     response.status(400).json({
       message: error.message,
@@ -51,12 +48,12 @@ export const update = async (request, response) => {
   const document = request.body;
   const options = { new: true };
   try {
-    const category = await Category.findOneAndUpdate(
+    const orderStatus = await OrderStatus.findOneAndUpdate(
       condition,
       document,
       options
     ).exec();
-    response.json(category);
+    response.json(orderStatus);
   } catch (error) {
     response.status(400).json({
       message: error.message,
