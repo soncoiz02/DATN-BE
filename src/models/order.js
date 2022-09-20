@@ -1,33 +1,39 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, { Schema } from 'mongoose';
 
 const { ObjectId } = mongoose.Types;
 
-const serviceSchema = new Schema({
+const serviceSchema = new Schema(
+  {
     dateStart: {
-        type: Date,
-        required: true
+      type: String,
+      required: true,
+    },
+    dateEnd: {
+      type: String,
+      required: true,
     },
     infoUser: {
+      name: {
         type: String,
-        required: true
-
+      },
+      phone: {
+        type: String,
+      },
     },
-    status: {
-        type: Number,
-        required: true
-
-    },
-    user_id: {
-        type: ObjectId,
-        ref: "User",
-
+    orderStatus_id: {
+      type: ObjectId,
+      ref: 'OrderStatus',
     },
     service_id: {
-        type: ObjectId,
-        ref: "Service",
+      type: ObjectId,
+      ref: 'Service',
     },
+    user_id: {
+      type: ObjectId,
+      ref: 'User',
+    },
+  },
+  { timestamps: true }
+);
 
-
-}, { timestamps: true });
-
-export default mongoose.model("Order", serviceSchema);
+export default mongoose.model('Order', serviceSchema);
