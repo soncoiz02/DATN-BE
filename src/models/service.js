@@ -28,7 +28,7 @@ const serviceSchema = new Schema(
       type: Number,
       required: true,
     },
-    ServiceStep_id: {
+    step: {
       type: ObjectId,
       ref: 'ServiceStep',
     },
