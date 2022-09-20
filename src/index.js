@@ -1,6 +1,5 @@
 import swaggerUI from 'swagger-ui-express';
 import YAML from 'yamljs';
-
 import express from 'express';
 import http from 'http';
 import dotenv from 'dotenv';

@@ -1,6 +1,5 @@
 import Category from '../models/category';
-// eslint-disable-next-line import/order
-// eslint-disable-next-line import/prefer-default-export
+
 export const create = async (request, response) => {
   try {
     const category = await new Category(request.body).save();
@@ -25,9 +24,7 @@ export const read = async (request, response) => {
   const condition = { _id: request.params.id };
   try {
     const category = await Category.findOne(condition).exec();
-    response.json({
-      category,
-    });
+    response.json(category);
   } catch (error) {
     console.log(error);
     response.status(400).json({
