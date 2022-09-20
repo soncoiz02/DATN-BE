@@ -14,7 +14,7 @@ export const create = (req, res) => {
 
 export const list = async (req, res) => {
   try {
-    const service = await Service.find({}).exec();
+    const service = await Service.find({}).populate('ServiceStep_id');
     return res.json(service);
   } catch (error) {
     return res.status(400).json({

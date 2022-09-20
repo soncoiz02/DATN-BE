@@ -28,6 +28,10 @@ const serviceSchema = new Schema(
       type: Number,
       required: true,
     },
+    ServiceStep_id: {
+      type: ObjectId,
+      ref: 'ServiceStep',
+    },
     store_id: {
       type: ObjectId,
       ref: 'Store',
