@@ -5,11 +5,11 @@ const { ObjectId } = mongoose.Types;
 const serviceSchema = new Schema(
   {
     dateStart: {
-      type: String,
+      type: Date,
       required: true,
     },
     dateEnd: {
-      type: String,
+      type: Date,
       required: true,
     },
     infoUser: {
@@ -20,7 +20,7 @@ const serviceSchema = new Schema(
         type: String,
       },
     },
-    orderStatus_id: {
+    orderStatus: {
       type: ObjectId,
       ref: 'OrderStatus',
     },

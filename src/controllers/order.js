@@ -15,8 +15,8 @@ export const create = async (req, res) => {
 export const list = async (req, res) => {
   try {
     const order = await Order.find({})
-      .populate('orderStatus_id')
-      .populate('service_id');
+      .populate('orderStatus')
+      .populate('service_id', 'name desc price image duration status');
     return res.json(order);
   } catch (error) {
     return res.status(400).json({
