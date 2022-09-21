@@ -119,6 +119,12 @@
 #           description: "id không hợp lệ"
 #         "404":
 #           description: "Không tìm thấy dịch vụ"
+#         description: The book id
+#       responses:
+#         "400":
+#           description: "Invalid ID supplied"
+#         "404":
+#           description: "Pet not found"
 #       security:
 #       - petstore_auth:
 #         - "write:pets"
@@ -414,3 +420,43 @@
 #         - "write:pets"
 #         - "read:pets"
 # #  End Service Step -----------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+# # Models
+# components:
+#   schemas:
+#     Service:
+#       properties:
+#         name:
+#           type: string
+#         desc:
+#           type: string
+#         price:
+#           type: integer
+#         image:
+#           type: string
+#         duration:
+#           type: integer
+#         status:
+#           type: integer
+#         store_id:
+#           type: string
+
+#       #   system_id:
+#       #     type: string
+#       required:
+#         - name
+#         - desc
+#         - price
+#         - image
+#         - duration
+#         - status
+#         - store_id
+
+
+# # End Service

@@ -1,5 +1,5 @@
 import Store from '../models/store';
-
+import Category from '../models/category';
 // eslint-disable-next-line import/prefer-default-export
 export const createStore = async (request, response) => {
   try {
@@ -20,8 +20,19 @@ export const listStore = async (request, response) => {
 };
 export const storeDetail = async (request, response) => {
   try {
-    const store = await Store.findOne({ _id: request.params.id }).exec();
-    response.json(store);
+    const store = await Store.findOne({ _id: request.params.id })
+      .select('-storeId')
+      .exec();
+    const category = await Category.findOne({
+      storeId: request.params.id,
+    }).exec();
+    console.log(category);
+    response.json({
+      // eslint-disable-next-line no-underscore-dangle
+      ...store._doc,
+      // eslint-disable-next-line no-underscore-dangle
+      category: category._doc,
+    });
   } catch (error) {
     response.status(400).json({ message: error.message });
   }

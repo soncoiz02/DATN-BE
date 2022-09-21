@@ -18,11 +18,11 @@ const postSchema = new Schema(
       type: Date,
       required: true,
     },
-    user_id: {
+    userId: {
       type: ObjectId,
       ref: 'User',
     },
-    store_id: {
+    storeId: {
       type: ObjectId,
       ref: 'Store',
     },

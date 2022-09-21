@@ -28,7 +28,7 @@ const serviceSchema = new Schema(
       type: Number,
       required: true,
     },
-    store_id: {
+    storeId: {
       type: ObjectId,
       ref: 'Store',
     },

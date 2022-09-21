@@ -1,6 +1,5 @@
 import swaggerUI from 'swagger-ui-express';
 import YAML from 'yamljs';
-
 import express from 'express';
 import http from 'http';
 import dotenv from 'dotenv';
@@ -16,6 +15,8 @@ import PostRoute from './routes/post';
 import orderStatusRoute from './routes/orderStatus';
 import OrderRoute from './routes/order';
 import OrderStepRoute from './routes/serviceStep';
+import OrderStepRoute from './routes/storeMemberShip';
+import storeMemberShip from './routes/storeMemberShip';
 
 const app = express();
 const swaggerJSDocs = YAML.load('./api.yaml');
@@ -34,6 +35,7 @@ app.use('/api', ServiceRoute);
 app.use('/api', PostRoute);
 app.use('/api', OrderRoute);
 app.use('/api', OrderStepRoute);
+app.use('/api', storeMemberShip);
 
 mongoose
   .connect(process.env.MONGODB_URI)

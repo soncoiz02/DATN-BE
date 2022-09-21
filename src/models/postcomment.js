@@ -14,11 +14,11 @@ const postCommentSchema = new Schema(
       type: Date,
       required: true,
     },
-    user_id: {
+    userId: {
       type: ObjectId,
       ref: 'User',
     },
-    post_id: {
+    postId: {
       type: ObjectId,
       ref: 'Post',
     },
