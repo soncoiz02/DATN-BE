@@ -1,4 +1,5 @@
 import Category from '../models/category';
+import Service from '../models/service';
 // eslint-disable-next-line import/order
 // eslint-disable-next-line import/prefer-default-export
 export const create = async (request, response) => {
@@ -25,8 +26,13 @@ export const read = async (request, response) => {
   const condition = { _id: request.params.id };
   try {
     const category = await Category.findOne(condition).exec();
+    const services = await Service.find({ category: category })
+      .populate('category_id')
+      .select('-category_id')
+      .exec();
     response.json({
-      category,
+      ...category._doc,
+      services,
     });
   } catch (error) {
     console.log(error);

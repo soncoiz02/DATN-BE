@@ -32,7 +32,7 @@ app.use('/api', orderStatusRoute);
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerJSDocs));
 app.use('/api', ServiceRoute);
 app.use('/api', PostRoute);
-app.use("/api", OrderRoute)
+app.use('/api', OrderRoute);
 app.use('/api', OrderStepRoute);
 
 mongoose
