@@ -14,7 +14,9 @@ export const create = async (req, res) => {
 
 export const list = async (req, res) => {
   try {
-    const order = await Order.find({}).exec();
+    const order = await Order.find({})
+      .populate('orderStatus')
+      .populate('service_id', 'name desc price image duration status');
     return res.json(order);
   } catch (error) {
     return res.status(400).json({
@@ -25,7 +27,9 @@ export const list = async (req, res) => {
 
 export const remove = async (req, res) => {
   try {
-    const order = await Order.findOneAndDelete({ _id: req.params.id }).exec();
+    const order = await Order.findOneAndDelete({ _id: req.params.id })
+      .populate('orderStatus')
+      .populate('service_id', 'name desc price image duration status');
     return res.json(order);
   } catch (error) {
     return res.status(400).json({
@@ -36,10 +40,9 @@ export const remove = async (req, res) => {
 
 export const update = async (req, res) => {
   try {
-    const order = await Order.findOneAndUpdate(
-      { _id: req.params.id },
-      req.body
-    ).exec();
+    const order = await Order.findOneAndUpdate({ _id: req.params.id }, req.body)
+      .populate('orderStatus')
+      .populate('service_id', 'name desc price image duration status');
     return res.json(order);
   } catch (error) {
     return res.status(400).json({
@@ -50,7 +53,9 @@ export const update = async (req, res) => {
 
 export const read = async (req, res) => {
   try {
-    const order = await Order.findOne({ _id: req.params.id }).exec();
+    const order = await Order.findOne({ _id: req.params.id })
+      .populate('orderStatus')
+      .populate('service_id', 'name desc price image duration status');
     return res.json(order);
   } catch (error) {
     return res.status(400).json({

@@ -8,21 +8,29 @@ const serviceSchema = new Schema(
       type: Date,
       required: true,
     },
+    dateEnd: {
+      type: Date,
+      required: true,
+    },
     infoUser: {
-      type: String,
-      required: true,
+      name: {
+        type: String,
+      },
+      phone: {
+        type: String,
+      },
     },
-    status: {
-      type: Number,
-      required: true,
-    },
-    user_id: {
+    orderStatus: {
       type: ObjectId,
-      ref: 'User',
+      ref: 'OrderStatus',
     },
     service_id: {
       type: ObjectId,
       ref: 'Service',
+    },
+    user_id: {
+      type: ObjectId,
+      ref: 'User',
     },
   },
   { timestamps: true }

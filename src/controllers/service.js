@@ -14,7 +14,7 @@ export const create = (req, res) => {
 
 export const list = async (req, res) => {
   try {
-    const service = await Service.find({}).exec();
+    const service = await Service.find({}).populate('step', 'title desc');
     return res.json(service);
   } catch (error) {
     return res.status(400).json({
@@ -41,7 +41,7 @@ export const update = async (req, res) => {
     const service = await Service.findOneAndUpdate(
       { _id: req.params.id },
       req.body
-    ).exec();
+    ).populate('step', 'title desc');
     return res.json(service);
   } catch (error) {
     return res.status(400).json({
@@ -52,7 +52,10 @@ export const update = async (req, res) => {
 
 export const read = async (req, res) => {
   try {
-    const service = await Service.findOne({ _id: req.params.id }).exec();
+    const service = await Service.findOne({ _id: req.params.id }).populate(
+      'step',
+      'title desc'
+    );
     return res.json(service);
   } catch (error) {
     return res.status(400).json({

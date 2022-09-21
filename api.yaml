@@ -113,26 +113,22 @@
 #         schema:
 #           type: string
 #         required: true
-# <<<<<<< HEAD
 #         description: ""
 #       responses:
 #         "400":
 #           description: "id không hợp lệ"
 #         "404":
 #           description: "Không tìm thấy dịch vụ"
-# =======
 #         description: The book id
 #       responses:
 #         "400":
 #           description: "Invalid ID supplied"
 #         "404":
 #           description: "Pet not found"
-# >>>>>>> 201814e (fix: conflict)
 #       security:
 #       - petstore_auth:
 #         - "write:pets"
 #         - "read:pets"
-# <<<<<<< HEAD
 # # End Service -----------------------------------------------------------------------------------------------------------------------------
 
 
@@ -424,7 +420,7 @@
 #         - "write:pets"
 #         - "read:pets"
 # #  End Service Step -----------------------------------------------------------------------------------------------------------------------------
-# =======
+
 
 
 
@@ -463,7 +459,3 @@
 
 
 # # End Service
-
-
- 
-# >>>>>>> 201814e (fix: conflict)

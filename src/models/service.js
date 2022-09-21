@@ -28,6 +28,18 @@ const serviceSchema = new Schema(
       type: Number,
       required: true,
     },
+    avgRated: {
+      type: Number,
+      required: true,
+    },
+    totalRated: {
+      type: Number,
+      required: true,
+    },
+    step: {
+      type: ObjectId,
+      ref: 'ServiceStep',
+    },
     store_id: {
       type: ObjectId,
       ref: 'Store',
