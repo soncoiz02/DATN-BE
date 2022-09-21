@@ -1,4 +1,6 @@
 import { Router } from 'express';
+import { listStoreByName, searchStore } from '../controllers/advancedStore';
+
 import {
   createStore,
   deleteStore,
@@ -14,5 +16,7 @@ router.get('/store', listStore);
 router.get('/store/:id', storeDetail);
 router.delete('/store/:id', deleteStore);
 router.put('/store/:id', updateStore);
+router.get('/search', searchStore);
+router.get('/storeName', listStoreByName);
 
 export default router;
