@@ -12,7 +12,7 @@ const serviceStepSchema = new Schema(
       type: String,
       required: true,
     },
-    service_id: {
+    serviceId: {
       type: ObjectId,
       ref: 'Service',
     },

@@ -4,9 +4,13 @@ import Order from '../models/order';
 export const create = async (req, res) => {
   try {
     const order = await new Order(req.body).save();
-    return res.json(order);
+    const detailOrder = await Order.findById(order._id)
+      .populate('status')
+      .populate('serviceId', 'name desc price image duration status')
+      .exec();
+    res.json(detailOrder);
   } catch (error) {
-    return res.status(400).json({
+    res.status(400).json({
       message: error.message,
     });
   }
@@ -15,11 +19,11 @@ export const create = async (req, res) => {
 export const list = async (req, res) => {
   try {
     const order = await Order.find({})
-      .populate('orderStatus')
-      .populate('service_id', 'name desc price image duration status');
-    return res.json(order);
+      .populate('status')
+      .populate('serviceId', 'name desc price image duration status');
+    res.json(order);
   } catch (error) {
-    return res.status(400).json({
+    res.status(400).json({
       message: error.message,
     });
   }
@@ -27,12 +31,10 @@ export const list = async (req, res) => {
 
 export const remove = async (req, res) => {
   try {
-    const order = await Order.findOneAndDelete({ _id: req.params.id })
-      .populate('orderStatus')
-      .populate('service_id', 'name desc price image duration status');
-    return res.json(order);
+    const order = await Order.findOneAndDelete({ _id: req.params.id }).exec();
+    res.json(order);
   } catch (error) {
-    return res.status(400).json({
+    res.status(400).json({
       message: error.message,
     });
   }
@@ -40,12 +42,14 @@ export const remove = async (req, res) => {
 
 export const update = async (req, res) => {
   try {
-    const order = await Order.findOneAndUpdate({ _id: req.params.id }, req.body)
-      .populate('orderStatus')
-      .populate('service_id', 'name desc price image duration status');
-    return res.json(order);
+    const order = await Order.findOneAndUpdate(
+      { _id: req.params.id },
+      req.body,
+      { new: true }
+    ).exec();
+    res.json(order);
   } catch (error) {
-    return res.status(400).json({
+    res.status(400).json({
       message: error.message,
     });
   }
@@ -54,11 +58,12 @@ export const update = async (req, res) => {
 export const read = async (req, res) => {
   try {
     const order = await Order.findOne({ _id: req.params.id })
-      .populate('orderStatus')
-      .populate('service_id', 'name desc price image duration status');
-    return res.json(order);
+      .populate('status')
+      .populate('serviceId', 'name desc price image duration status')
+      .exec();
+    res.json(order);
   } catch (error) {
-    return res.status(400).json({
+    res.status(400).json({
       message: error.message,
     });
   }

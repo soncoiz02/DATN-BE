@@ -21,10 +21,10 @@ export const listStore = async (request, response) => {
 export const storeDetail = async (request, response) => {
   try {
     const store = await Store.findOne({ _id: request.params.id })
-      .select('-store_id')
+      .select('-storeId')
       .exec();
     const category = await Category.findOne({
-      store_id: request.params.id,
+      storeId: request.params.id,
     }).exec();
     console.log(category);
     response.json({

@@ -4,9 +4,9 @@ import ServiceStep from '../models/serviceStep';
 export const create = async (req, res) => {
   try {
     const serviceStep = await new ServiceStep(req.body).save();
-    return res.json(serviceStep);
+    res.json(serviceStep);
   } catch (error) {
-    return res.status(400).json({
+    res.status(400).json({
       message: error.message,
     });
   }
@@ -15,9 +15,9 @@ export const create = async (req, res) => {
 export const list = async (req, res) => {
   try {
     const serviceStep = await ServiceStep.find({}).exec();
-    return res.json(serviceStep);
+    res.json(serviceStep);
   } catch (error) {
-    return res.status(400).json({
+    res.status(400).json({
       message: error.message,
     });
   }
@@ -28,9 +28,9 @@ export const remove = async (req, res) => {
     const serviceStep = await ServiceStep.findOneAndDelete({
       _id: req.params.id,
     }).exec();
-    return res.json(serviceStep);
+    res.json(serviceStep);
   } catch (error) {
-    return res.status(400).json({
+    res.status(400).json({
       message: error.message,
     });
   }
@@ -40,11 +40,12 @@ export const update = async (req, res) => {
   try {
     const serviceStep = await ServiceStep.findOneAndUpdate(
       { _id: req.params.id },
-      req.body
+      req.body,
+      { new: true }
     ).exec();
-    return res.json(serviceStep);
+    res.json(serviceStep);
   } catch (error) {
-    return res.status(400).json({
+    res.status(400).json({
       message: error.message,
     });
   }
@@ -55,9 +56,9 @@ export const read = async (req, res) => {
     const serviceStep = await ServiceStep.findOne({
       _id: req.params.id,
     }).exec();
-    return res.json(serviceStep);
+    res.json(serviceStep);
   } catch (error) {
-    return res.status(400).json({
+    res.status(400).json({
       message: error.message,
     });
   }
