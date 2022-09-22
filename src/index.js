@@ -15,7 +15,6 @@ import PostRoute from './routes/post';
 import orderStatusRoute from './routes/orderStatus';
 import OrderRoute from './routes/order';
 import OrderStepRoute from './routes/serviceStep';
-import OrderStepRoute from './routes/storeMemberShip';
 import storeMemberShip from './routes/storeMemberShip';
 
 const app = express();

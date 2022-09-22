@@ -1,5 +1,12 @@
 import { Router } from 'express';
-import { create, list, read, remove, update } from '../controllers/order';
+import {
+  create,
+  filterByStatus,
+  list,
+  read,
+  remove,
+  update,
+} from '../controllers/order';
 
 const route = Router();
 
@@ -12,5 +19,8 @@ route.delete('/order/:id', remove);
 route.put('/order/:id', update);
 // chi tiet
 route.get('/order/:id', read);
+
+// /api/filterByStatus?status=
+route.get('/filterByStatus', filterByStatus);
 
 export default route;

@@ -4,6 +4,7 @@ import Order from '../models/order';
 export const create = async (req, res) => {
   try {
     const order = await new Order(req.body).save();
+    // eslint-disable-next-line no-underscore-dangle
     const detailOrder = await Order.findById(order._id)
       .populate('status')
       .populate('serviceId', 'name desc price image duration status')
@@ -61,6 +62,25 @@ export const read = async (req, res) => {
       .populate('status')
       .populate('serviceId', 'name desc price image duration status')
       .exec();
+    res.json(order);
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+    });
+  }
+};
+
+export const filterByStatus = async (req, res) => {
+  // let filter = {}
+  // if (req.query.status) {
+  //     // eslint-disable-next-line no-unused-vars
+  //     filter = { status: req.query.status.split(',') }
+  // }
+
+  try {
+    const order = await Order.find({ status: req.query.status.split(',') })
+      .populate('status')
+      .populate('serviceId', 'name desc price image duration status');
     res.json(order);
   } catch (error) {
     res.status(400).json({
