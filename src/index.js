@@ -17,8 +17,8 @@ import OrderRoute from './routes/order';
 import OrderStepRoute from './routes/serviceStep';
 import userRouter from './routes/user';
 import authRouter from './routes/auth';
-import OrderStepRoute from './routes/storeMemberShip';
 import storeMemberShip from './routes/storeMemberShip';
+import storeRatingRouter from './routes/storeRating';
 
 const app = express();
 const swaggerJSDocs = YAML.load('./api.yaml');
@@ -40,6 +40,7 @@ app.use('/api', OrderStepRoute);
 app.use('/api', userRouter);
 app.use('/api', authRouter);
 app.use('/api', storeMemberShip);
+app.use('/api', storeRatingRouter);
 
 mongoose
   .connect(process.env.MONGODB_URI)

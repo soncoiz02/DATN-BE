@@ -1,15 +1,17 @@
-import mongoose, { Schema, ObjectId } from "mongoose";
+import mongoose, { Schema, ObjectId } from 'mongoose';
 
-const storeMemberShip = new Schema({
+const storeMemberShip = new Schema(
+  {
     userId: {
-        type: ObjectId,
-        ref: "User",
+      type: ObjectId,
+      ref: 'User',
     },
     storeId: {
-        type: ObjectId,
-        ref: "Store",
+      type: ObjectId,
+      ref: 'Store',
     },
+  },
+  { timestamps: true }
+);
 
-}, { timestamps: true });
-
-export default mongoose.model("StoreMemberShip", storeMemberShip);
+export default mongoose.model('StoreMemberShip', storeMemberShip);
