@@ -28,21 +28,13 @@ const serviceSchema = new Schema(
       type: Number,
       required: true,
     },
-    avgRated: {
-      type: Number,
-      required: true,
-    },
-    totalRated: {
-      type: Number,
-      required: true,
-    },
-    step: {
+    categoryId: {
       type: ObjectId,
-      ref: 'ServiceStep',
+      ref: 'Category',
     },
-    store_id: {
+    category_id: {
       type: ObjectId,
-      ref: 'Store',
+      ref: 'Category',
     },
   },
   { timestamps: true }

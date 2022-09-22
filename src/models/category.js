@@ -12,7 +12,7 @@ const categoryServiece = new Schema(
       unique: true,
       index: true,
     },
-    store_id: {
+    storeId: {
       type: ObjectId,
       ref: 'Store',
     },

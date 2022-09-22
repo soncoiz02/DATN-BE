@@ -4,11 +4,11 @@ const { ObjectId } = mongoose.Types;
 
 const serviceSchema = new Schema(
   {
-    dateStart: {
+    startDate: {
       type: Date,
       required: true,
     },
-    dateEnd: {
+    endDate: {
       type: Date,
       required: true,
     },
@@ -20,15 +20,15 @@ const serviceSchema = new Schema(
         type: String,
       },
     },
-    orderStatus: {
+    status: {
       type: ObjectId,
       ref: 'OrderStatus',
     },
-    service_id: {
+    serviceId: {
       type: ObjectId,
       ref: 'Service',
     },
-    user_id: {
+    userId: {
       type: ObjectId,
       ref: 'User',
     },
