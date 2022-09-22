@@ -15,6 +15,8 @@ import PostRoute from './routes/post';
 import orderStatusRoute from './routes/orderStatus';
 import OrderRoute from './routes/order';
 import OrderStepRoute from './routes/serviceStep';
+import userRouter from './routes/user';
+import authRouter from './routes/auth';
 
 const app = express();
 const swaggerJSDocs = YAML.load('./api.yaml');
@@ -33,6 +35,8 @@ app.use('/api', ServiceRoute);
 app.use('/api', PostRoute);
 app.use('/api', OrderRoute);
 app.use('/api', OrderStepRoute);
+app.use('/api', userRouter);
+app.use('/api', authRouter);
 
 mongoose
   .connect(process.env.MONGODB_URI)
