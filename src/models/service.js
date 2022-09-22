@@ -28,9 +28,9 @@ const serviceSchema = new Schema(
       type: Number,
       required: true,
     },
-    storeId: {
+    categoryId: {
       type: ObjectId,
-      ref: 'Store',
+      ref: 'Category',
     },
   },
   { timestamps: true }
