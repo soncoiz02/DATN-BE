@@ -16,7 +16,7 @@ export const listStoreRating = async (req, res) => {
   try {
     const storeRating = await StoreRating.find({})
       .populate('userId', 'email username')
-      .populate('storeId');
+      .populate('storeId', 'name address avt hotline');
     res.json(storeRating);
   } catch (error) {
     res.status(400).json({
@@ -63,7 +63,9 @@ export const readStoreRating = async (req, res) => {
   try {
     const storeRating = await StoreRating.findOne({
       _id: req.params.id,
-    }).exec();
+    })
+      .populate('userId', 'email username')
+      .populate('storeId', 'name address avt hotline');
     res.json(storeRating);
   } catch (error) {
     res.status(400).json({
