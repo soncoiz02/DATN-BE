@@ -68,3 +68,23 @@ export const read = async (req, res) => {
     });
   }
 };
+
+export const filterUserByService = async (req, res) => {
+  // let filter = {}
+  // if (req.query.status) {
+  //     // eslint-disable-next-line no-unused-vars
+  //     filter = { status: req.query.status.split(',') }
+  // }
+
+  try {
+    const order = await Order.find({ userId: req.query.userId.split(',') })
+      .populate('status')
+      .populate('serviceId', 'name desc price image duration status')
+      .populate('userId');
+    res.json(order);
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+    });
+  }
+};
