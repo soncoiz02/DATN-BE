@@ -19,7 +19,7 @@ import userRouter from './routes/user';
 import authRouter from './routes/auth';
 import OrderStepRoute from './routes/storeMemberShip';
 import storeMemberShip from './routes/storeMemberShip';
-
+import UserNotifyRoute from './routes/usernotify';
 const app = express();
 const swaggerJSDocs = YAML.load('./api.yaml');
 
@@ -40,6 +40,7 @@ app.use('/api', OrderStepRoute);
 app.use('/api', userRouter);
 app.use('/api', authRouter);
 app.use('/api', storeMemberShip);
+app.use('/api', UserNotifyRoute);
 
 mongoose
   .connect(process.env.MONGODB_URI)
