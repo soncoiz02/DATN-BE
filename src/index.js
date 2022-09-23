@@ -17,7 +17,6 @@ import OrderRoute from './routes/order';
 import OrderStepRoute from './routes/serviceStep';
 import userRouter from './routes/user';
 import authRouter from './routes/auth';
-import OrderStepRoute from './routes/storeMemberShip';
 import storeMemberShip from './routes/storeMemberShip';
 import UserNotifyRoute from './routes/usernotify';
 const app = express();
