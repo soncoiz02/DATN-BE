@@ -1,5 +1,9 @@
 import { Router } from 'express';
-import { listStoreByName, searchStore } from '../controllers/advancedStore';
+import {
+  listStoreByName,
+  searchStore,
+  filterByRate,
+} from '../controllers/advancedStore';
 
 import {
   createStore,
@@ -18,5 +22,6 @@ router.delete('/store/:id', deleteStore);
 router.put('/store/:id', updateStore);
 router.get('/search', searchStore);
 router.get('/storeName', listStoreByName);
+router.get('/filter', filterByRate);
 
 export default router;

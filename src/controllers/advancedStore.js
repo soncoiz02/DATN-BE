@@ -19,6 +19,16 @@ export const listStoreByName = async (request, response) => {
     response.json(store);
   } catch (error) {
     console.log(error);
-    response.status(400).json({ message: 'không có danh sách' });
+    response.status(400).json({ message: error.message });
+  }
+};
+
+export const filterByRate = async (request, response) => {
+  try {
+    const store = await Store.find({ visiter: '5' });
+    response.json(store);
+  } catch (error) {
+    console.log(error);
+    response.status(400).json({ message: error.message });
   }
 };
