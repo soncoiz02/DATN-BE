@@ -1,5 +1,12 @@
 import { Router } from 'express';
-import { create, list, read, remove, update } from '../controllers/order';
+import {
+  create,
+  filterUserByService,
+  list,
+  read,
+  remove,
+  update,
+} from '../controllers/order';
 
 const route = Router();
 
@@ -13,4 +20,6 @@ route.put('/order/:id', update);
 // chi tiet
 route.get('/order/:id', read);
 
+// /api/filterUserByService?status=
+route.get('/filterUserByService', filterUserByService);
 export default route;
