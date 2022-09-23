@@ -22,7 +22,7 @@ export const read = async (request, response) => {
   try {
     const storeNotify = await StoreNotify.findOne({
       _id: request.params.id,
-    }).exec();
+    }).populate('userId', 'username email');
     response.json(storeNotify);
   } catch (error) {
     response.status(400).json({ message: error.message });
