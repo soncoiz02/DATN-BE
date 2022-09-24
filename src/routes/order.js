@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import {
   create,
-  filterUserByService,
+  filterByStatus,
   list,
   read,
   remove,
@@ -20,6 +20,6 @@ route.put('/order/:id', update);
 // chi tiet
 route.get('/order/:id', read);
 
-// /api/filterUserByService?status=
-route.get('/filterUserByService', filterUserByService);
+// /api/filterByStatus?status=
+route.get('/filterByStatus', filterByStatus);
 export default route;
