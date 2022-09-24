@@ -22,5 +22,4 @@ route.get('/order/:id', read);
 
 // /api/filterByStatus?status=
 route.get('/filterByStatus', filterByStatus);
-
 export default route;

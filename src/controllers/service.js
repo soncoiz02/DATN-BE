@@ -64,7 +64,7 @@ export const update = async (req, res) => {
     const service = await Service.findOneAndUpdate(
       { _id: req.params.id },
       req.body
-    ).populate('step', 'title desc');
+    );
     res.json(service);
   } catch (error) {
     res.status(400).json({
@@ -78,15 +78,19 @@ export const read = async (req, res) => {
     const service = await Service.findOne({ _id: req.params.id }).exec();
     const rated = await ServiceRating.find({ serviceId: req.params.id }).exec();
     const steps = await ServiceStep.find({ serviceId: req.params.id }).exec();
+    const ratedAvg =
+      rated.length > 0
+        ? (
+            rated.reduce((prev, rateItem) => prev + rateItem.rate, 0) /
+            rated.length
+          ).toFixed(2)
+        : 0;
     res.json({
       ...service._doc,
       steps,
       rated: {
         total: rated.length,
-        avg: (
-          rated.reduce((prev, rateItem) => prev + rateItem.rate, 0) /
-          rated.length
-        ).toFixed(2),
+        avg: ratedAvg,
       },
     });
   } catch (error) {

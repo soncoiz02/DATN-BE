@@ -1,12 +1,12 @@
 import swaggerUI from 'swagger-ui-express';
 import YAML from 'yamljs';
+
 import express from 'express';
 import http from 'http';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import mongoose from 'mongoose';
 import serviceRatingRouter from './routes/serviceRating';
-
 import storeRouter from './routes/store';
 import categoryRouter from './routes/category';
 import ServiceRoute from './routes/service';
@@ -15,8 +15,12 @@ import PostRoute from './routes/post';
 import orderStatusRoute from './routes/orderStatus';
 import OrderRoute from './routes/order';
 import OrderStepRoute from './routes/serviceStep';
+import StoreNotifyRoute from './routes/storenotify';
+import userRouter from './routes/user';
+import authRouter from './routes/auth';
 import storeMemberShip from './routes/storeMemberShip';
-
+import storeRatingRouter from './routes/storeRating';
+import UserNotifyRoute from './routes/usernotify';
 const app = express();
 const swaggerJSDocs = YAML.load('./api.yaml');
 
@@ -34,7 +38,12 @@ app.use('/api', ServiceRoute);
 app.use('/api', PostRoute);
 app.use('/api', OrderRoute);
 app.use('/api', OrderStepRoute);
+app.use('/api', StoreNotifyRoute);
+app.use('/api', userRouter);
+app.use('/api', authRouter);
 app.use('/api', storeMemberShip);
+app.use('/api', storeRatingRouter);
+app.use('/api', UserNotifyRoute);
 
 mongoose
   .connect(process.env.MONGODB_URI)
