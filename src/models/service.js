@@ -40,4 +40,6 @@ const serviceSchema = new Schema(
   { timestamps: true }
 );
 
+serviceSchema.index({ '$**': 'text' });
+
 export default mongoose.model('Service', serviceSchema);

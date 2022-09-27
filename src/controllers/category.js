@@ -69,3 +69,12 @@ export const update = async (request, response) => {
     });
   }
 };
+
+export const searchCate = async (req, res) => {
+  const searchString = req.query.q ? req.query.q : '';
+
+  const result = await Category.find({
+    $text: { $search: searchString },
+  }).exec();
+  res.json(result);
+};
