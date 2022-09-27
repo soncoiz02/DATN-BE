@@ -12,7 +12,7 @@ export const createStore = async (request, response) => {
 };
 export const listStore = async (request, response) => {
   try {
-    const store = await Store.find({}).exec();
+    const store = await Store.find({}).populate('rateId', 'rate content');
     response.json(store);
   } catch (error) {
     response.status(400).json({ message: error.message });
