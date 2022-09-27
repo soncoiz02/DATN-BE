@@ -20,4 +20,6 @@ const categoryServiece = new Schema(
   { timestamps: true }
 );
 
+categoryServiece.index({ '$**': 'text' });
+
 export default mongoose.model('Category', categoryServiece);
