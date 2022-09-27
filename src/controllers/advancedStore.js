@@ -22,10 +22,10 @@ export const listStoreByName = async (request, response) => {
     response.status(400).json({ message: error.message });
   }
 };
-
 export const filterByRate = async (request, response) => {
   try {
-    const store = await Store.find({ visiter: '5' });
+    const store = await Store.find({ rateId: request.query.rateId.split(',') });
+    console.log(store);
     response.json(store);
   } catch (error) {
     console.log(error);

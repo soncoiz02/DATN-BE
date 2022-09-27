@@ -22,6 +22,6 @@ router.delete('/store/:id', deleteStore);
 router.put('/store/:id', updateStore);
 router.get('/search', searchStore);
 router.get('/storeName', listStoreByName);
-router.get('/filter', filterByRate);
+router.get('/filterByRate', filterByRate);
 
 export default router;
