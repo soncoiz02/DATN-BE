@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import {
   create,
+  findByStoreId,
   list,
   read,
   remove,
@@ -27,5 +28,8 @@ route.get('/service/:id', read);
 
 // đường dẫn như này nhé  /api/search?q= tên
 route.post('/search-service', search);
+
+// find by storeId
+route.get('/service/findByStoreId/:id', findByStoreId);
 
 export default route;
