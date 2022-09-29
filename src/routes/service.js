@@ -5,6 +5,7 @@ import {
   read,
   remove,
   sort,
+  search,
   update,
 } from '../controllers/service';
 
@@ -23,5 +24,8 @@ route.delete('/service/:id', remove);
 route.put('/service/:id', update);
 // chi tiet
 route.get('/service/:id', read);
+
+// đường dẫn như này nhé  /api/search?q= tên
+route.post('/search-service', search);
 
 export default route;

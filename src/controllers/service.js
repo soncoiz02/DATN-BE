@@ -101,6 +101,16 @@ export const read = async (req, res) => {
   }
 };
 
+export const search = async (req, res) => {
+  const searchString = req.query.q ? req.query.q : '';
+
+  const result = await Service.find({
+    $text: { $search: searchString },
+  }).exec();
+  res.json(result);
+};
+
+
 export const sort = async (req, res) => {
   try {
     const service = await Service.find({}).exec();
@@ -138,4 +148,4 @@ export const sort = async (req, res) => {
       message: error.message,
     });
   }
-};
+  

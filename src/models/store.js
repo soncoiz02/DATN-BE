@@ -30,6 +30,10 @@ const storeSchema = new Schema(
       type: Number,
       required: true,
     },
+    rateId: {
+      type: ObjectId,
+      ref: 'ServiceRating',
+    },
   },
   { timestamps: true }
 );
