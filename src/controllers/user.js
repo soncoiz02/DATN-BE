@@ -19,7 +19,9 @@ export const GetoneUser = async (request, response) => {
 // eslint-disable-next-line consistent-return
 export const listUser = async (req, response) => {
   try {
-    const user = await User.find().sort({ createAt: -1 }).exec();
+    const user = await User.find({}, 'username name birthday phone email avt ')
+      .sort({ createAt: -1 })
+      .exec();
     response.json(user);
     console.log(user);
   } catch (error) {
