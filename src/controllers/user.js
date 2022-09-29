@@ -7,7 +7,11 @@ export const GetoneUser = async (request, response) => {
     const user = await User.findOne(condition).exec();
     response.json({
       username: user.username,
+      name: user.name,
+      birthday: user.birthday,
+      phone: user.phone,
       email: user.email,
+      avt: user.avt,
     });
   } catch (error) {
     console.log(error);
