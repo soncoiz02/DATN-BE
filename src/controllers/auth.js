@@ -6,10 +6,10 @@ export const register = async (request, response) => {
     request.body;
   console.log(request.body);
   try {
-    const exitUser = await User.findOne({ email }).exec();
+    const exitUser = await User.findOne({ username }).exec();
     if (exitUser) {
       return response.status(400).json({
-        message: 'Email existed',
+        message: 'Account existed',
       });
     }
     const user = await new User({
@@ -54,8 +54,20 @@ export const login = async (request, response) => {
         message: 'Password is wrong',
       });
     }
-    const token = Jwt.sign({ _id: user.id }, '123456', { expiresIn: 60 * 60 });
-    response.json(token);
+    const token = Jwt.sign({ _id: user.id }, '123456', {
+      expiresIn: 60 * 60 * 24,
+    });
+    response.json({
+      token,
+      user: {
+        name: user.name,
+        username: user.username,
+        birthday: user.birthday,
+        phone: user.phone,
+        email: user.email,
+        avt: user.avt,
+      },
+    });
   } catch (error) {
     response.status(400).json({
       message: error.message,
