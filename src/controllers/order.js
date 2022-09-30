@@ -1,4 +1,6 @@
+import { endOfDay, startOfDay } from 'date-fns';
 import Order from '../models/order';
+import Service from '../models/service';
 
 // eslint-disable-next-line import/prefer-default-export
 export const create = async (req, res) => {
@@ -82,6 +84,36 @@ export const filterByStatus = async (req, res) => {
       .populate('status')
       .populate('serviceId', 'name desc price image duration status');
     res.json(order);
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+    });
+  }
+};
+
+export const getTodayOrder = async (req, res) => {
+  try {
+    const totalSlot = [];
+    const { service, date } = req.query;
+    const startDay = startOfDay(new Date(date)).toISOString();
+    const endDay = endOfDay(new Date(date)).toISOString();
+    const order = await Order.find({
+      startDate: {
+        $gte: startDay,
+        $lte: endDay,
+      },
+      serviceId: service,
+      status: { $ne: '632bc765dc2a7f68a3f383eb' },
+    }).exec();
+    const serviceData = await Service.findOne({ _id: service }).exec();
+    serviceData.timeSlot.forEach((time) => {
+      const filterOrder = order.filter(
+        (item) => new Date(item.startDate).getHours() === Math.floor(time)
+      );
+      totalSlot.push(filterOrder.length);
+    });
+
+    res.json(totalSlot);
   } catch (error) {
     res.status(400).json({
       message: error.message,
