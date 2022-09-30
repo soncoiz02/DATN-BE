@@ -32,10 +32,6 @@ const serviceSchema = new Schema(
       type: ObjectId,
       ref: 'Category',
     },
-    category_id: {
-      type: ObjectId,
-      ref: 'Category',
-    },
   },
   { timestamps: true }
 );

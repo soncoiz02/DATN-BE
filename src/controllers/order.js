@@ -22,7 +22,33 @@ export const list = async (req, res) => {
     const order = await Order.find({})
       .populate('status')
       .populate('serviceId', 'name desc price image duration status');
-    res.json(order);
+    let total_count = 0;
+    let pending_count = 0;
+    let reject_count = 0;
+    let accepted_count = 0;
+    let done_count = 0;
+    for (let i = 0; i < order.length; i++) {
+      if (order[i].status.type === 'pending') {
+        pending_count += 1;
+      } else if (order[i].status.type === 'reject') {
+        reject_count += 1;
+      } else if (order[i].status.type === 'accepted') {
+        accepted_count += 1;
+      } else if (order[i].status.type === 'done') {
+        done_count += 1;
+      }
+      total_count += 1;
+    }
+    res.json({
+      summary: {
+        total: total_count,
+        pending: pending_count,
+        reject: reject_count,
+        accepted: accepted_count,
+        done: done_count,
+      },
+      orders: order,
+    });
   } catch (error) {
     res.status(400).json({
       message: error.message,

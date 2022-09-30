@@ -18,7 +18,7 @@ export const create = async (req, res) => {
 
 export const list = async (req, res) => {
   try {
-    const service = await Service.find({}).exec();
+    const service = await Service.find({}).populate('categoryId');
     const rated = await ServiceRating.find({}).exec();
     const steps = await ServiceStep.find({}).exec();
     const newService = service.map((item) => {
