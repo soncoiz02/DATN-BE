@@ -24,7 +24,9 @@ export const listStoreByName = async (request, response) => {
 };
 export const filterByRate = async (request, response) => {
   try {
-    const store = await Store.find({ rateId: request.query.rateId.split(',') });
+    const store = await Store.find({
+      rateId: request.query.rateId.split(','),
+    }).populate('rateId', 'rate content');
     console.log(store);
     response.json(store);
   } catch (error) {
