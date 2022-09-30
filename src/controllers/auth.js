@@ -54,7 +54,9 @@ export const login = async (request, response) => {
         message: 'Password is wrong',
       });
     }
-    const token = Jwt.sign({ _id: user.id }, '123456', { expiresIn: 60 * 60 });
+    const token = Jwt.sign({ _id: user.id }, '123456', {
+      expiresIn: 60 * 60 * 24,
+    });
     response.json({
       token,
       user: {
