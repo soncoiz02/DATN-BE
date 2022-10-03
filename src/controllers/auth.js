@@ -23,7 +23,11 @@ export const register = async (request, response) => {
       avt,
       roleId: '6336718c9f0cdce7e66cba12',
     }).save();
+    const token = Jwt.sign({ _id: user.id }, '123456', {
+      expiresIn: 60 * 60 * 24,
+    });
     response.json({
+      token,
       user: {
         _id: user.id,
         username: user.username,
