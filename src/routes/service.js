@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import {
   create,
-  findByStoreId,
   list,
   read,
   remove,
@@ -9,6 +8,7 @@ import {
   search,
   update,
   filter,
+  getServiceByStore,
 } from '../controllers/service';
 
 const route = Router();
@@ -34,6 +34,6 @@ route.get('/service/:id', read);
 route.post('/search-service', search);
 
 // find by storeId
-route.get('/service/findByStoreId/:id', findByStoreId);
+route.get('/service/findByStoreId/:id', getServiceByStore);
 
 export default route;
