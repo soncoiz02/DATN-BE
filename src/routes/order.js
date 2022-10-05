@@ -2,7 +2,9 @@ import { Router } from 'express';
 import {
   create,
   filterByStatus,
-  getTodayOrder,
+  getFutureOrder,
+  getOrderByDate,
+  getOrderByUser,
   list,
   read,
   remove,
@@ -24,6 +26,10 @@ route.get('/order/:id', read);
 // /api/filterByStatus?status=
 route.get('/filterByStatus', filterByStatus);
 
-route.get('/getTodayOrder', getTodayOrder);
+route.get('/getOrderByDate', getOrderByDate);
+
+route.get('/getOrderByUserAndDate', getOrderByUser);
+
+route.get('/getFutureOrder', getFutureOrder);
 
 export default route;
