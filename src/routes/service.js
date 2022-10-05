@@ -1,13 +1,14 @@
 import { Router } from 'express';
 import {
   create,
-  findByStoreId,
   list,
   read,
   remove,
   sort,
   search,
   update,
+  filter,
+  getServiceByStore,
 } from '../controllers/service';
 
 const route = Router();
@@ -18,6 +19,9 @@ route.get('/service', list);
 
 // sort by rated theo avg        /api/service/sortByRated?order=0-1     0 đánh giá từ nhỏ-> lớn  1 ngược lại nhé
 route.get('/service/sortByRated', sort);
+
+// filter
+route.get('/service/filter', filter);
 
 // remove
 route.delete('/service/:id', remove);
@@ -30,6 +34,6 @@ route.get('/service/:id', read);
 route.post('/search-service', search);
 
 // find by storeId
-route.get('/service/findByStoreId/:id', findByStoreId);
+route.get('/service/findByStoreId/:id', getServiceByStore);
 
 export default route;

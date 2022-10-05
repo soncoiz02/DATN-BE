@@ -1,6 +1,8 @@
 import mongoose from 'mongoose';
 import { createHmac } from 'crypto';
 
+const { ObjectId } = mongoose.Types;
+
 const userSchema = new mongoose.Schema(
   {
     username: {
@@ -32,6 +34,10 @@ const userSchema = new mongoose.Schema(
     },
     avt: {
       type: String,
+    },
+    roleId: {
+      type: ObjectId,
+      ref: 'UserRole',
     },
   },
   { timestamps: true }
