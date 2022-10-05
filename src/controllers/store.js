@@ -1,5 +1,6 @@
 import Store from '../models/store';
 import Category from '../models/category';
+import storeRating from '../models/storeRating';
 // eslint-disable-next-line import/prefer-default-export
 export const createStore = async (request, response) => {
   try {
@@ -10,12 +11,28 @@ export const createStore = async (request, response) => {
     console.log(error);
   }
 };
-export const listStore = async (request, response) => {
+export const listStore = async (req, res) => {
   try {
-    const store = await Store.find({}).populate('rateId', 'rate content');
-    response.json(store);
+    const store = await Store.find({}).exec();
+    const rated = await storeRating.find({}).exec();
+    const newStore = store.map((item) => {
+      const storeRated = rated.filter((rate) => rate.storeId.equals(item._id));
+      return {
+        ...item._doc,
+        rated: {
+          total: storeRated.length,
+          avg: (
+            storeRated.reduce((prev, rateItem) => prev + rateItem.rate, 0) /
+            storeRated.length
+          ).toFixed(2),
+        },
+      };
+    });
+    res.json(newStore);
   } catch (error) {
-    response.status(400).json({ message: error.message });
+    res.status(400).json({
+      message: error.message,
+    });
   }
 };
 export const storeDetail = async (request, response) => {
