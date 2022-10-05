@@ -26,9 +26,9 @@ export const read = async (request, response) => {
   const condition = { _id: request.params.id };
   try {
     const category = await Category.findOne(condition).exec();
-    const services = await Service.find({ category: category })
-      .populate('category_id')
-      .select('-category_id')
+    const services = await Service.find({ category })
+      .populate('categoryId')
+      .select('-categoryId')
       .exec();
     response.json({
       ...category._doc,

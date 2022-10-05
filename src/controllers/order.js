@@ -1,6 +1,7 @@
-import { endOfDay, startOfDay } from 'date-fns';
+import { endOfDay, startOfDay, startOfToday } from 'date-fns';
 import Order from '../models/order';
 import Service from '../models/service';
+import User from '../models/user';
 
 // eslint-disable-next-line import/prefer-default-export
 export const create = async (req, res) => {
@@ -91,7 +92,7 @@ export const filterByStatus = async (req, res) => {
   }
 };
 
-export const getTodayOrder = async (req, res) => {
+export const getOrderByDate = async (req, res) => {
   try {
     const totalSlot = [];
     const { service, date } = req.query;
@@ -114,6 +115,61 @@ export const getTodayOrder = async (req, res) => {
     });
 
     res.json(totalSlot);
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+    });
+  }
+};
+
+const convertTimeToNumber = (date) => {
+  const time = new Date(date);
+  const hours = time.getHours();
+  const minutes = time.getMinutes();
+  const number = hours + minutes / 60;
+  return Number(number.toFixed(1));
+};
+
+export const getOrderByUser = async (req, res) => {
+  try {
+    const { service, date, userPhone } = req.query;
+    const startDay = startOfDay(new Date(date)).toISOString();
+    const endDay = endOfDay(new Date(date)).toISOString();
+    const order = await Order.find({
+      startDate: {
+        $gte: startDay,
+        $lte: endDay,
+      },
+      serviceId: service,
+      status: { $ne: '632bc765dc2a7f68a3f383eb' },
+      'infoUser.phone': userPhone,
+    }).exec();
+    const orderEndTime = order.map((item) => {
+      const endTime = convertTimeToNumber(item.endDate);
+      const startTime = convertTimeToNumber(item.startDate);
+      return {
+        start: startTime,
+        end: endTime,
+      };
+    });
+    res.json(orderEndTime);
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+    });
+  }
+};
+
+export const getFutureOrder = async (req, res) => {
+  try {
+    const today = startOfToday().toISOString();
+    const order = Order.find({
+      startDate: {
+        $gte: today,
+      },
+      status: { $ne: '632bc765dc2a7f68a3f383eb' },
+    }).exec();
+    res.json(order);
   } catch (error) {
     res.status(400).json({
       message: error.message,
