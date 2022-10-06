@@ -16,8 +16,10 @@ export const listStore = async (req, res) => {
     const store = await Store.find({}).exec();
     const rated = await storeRating.find({}).exec();
     const newStore = store.map((item) => {
+      // eslint-disable-next-line no-underscore-dangle
       const storeRated = rated.filter((rate) => rate.storeId.equals(item._id));
       return {
+        // eslint-disable-next-line no-underscore-dangle
         ...item._doc,
         rated: {
           total: storeRated.length,
@@ -43,12 +45,24 @@ export const storeDetail = async (request, response) => {
     const category = await Category.findOne({
       storeId: request.params.id,
     }).exec();
+    const rated = await storeRating.find({ storeId: request.params.id }).exec();
+    const ratedAvg =
+      rated.length > 0
+        ? (
+            rated.reduce((prev, rateItem) => prev + rateItem.rate, 0) /
+            rated.length
+          ).toFixed(2)
+        : 0;
     console.log(category);
     response.json({
       // eslint-disable-next-line no-underscore-dangle
       ...store._doc,
       // eslint-disable-next-line no-underscore-dangle
       category: category._doc,
+      rated: {
+        total: rated.length,
+        avg: ratedAvg,
+      },
     });
   } catch (error) {
     response.status(400).json({ message: error.message });

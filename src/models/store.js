@@ -26,13 +26,17 @@ const storeSchema = new Schema(
       type: Number,
       required: true,
     },
-    visiter: {
+    open: {
       type: Number,
       required: true,
     },
-    rateId: {
-      type: ObjectId,
-      ref: 'StoreRating',
+    close: {
+      type: Number,
+      required: true,
+    },
+    visiter: {
+      type: Number,
+      required: true,
     },
   },
   { timestamps: true }
