@@ -73,3 +73,22 @@ export const readStoreRating = async (req, res) => {
     });
   }
 };
+
+export const getStoreRated = async (request, response) => {
+  try {
+    const { storeId } = request.query;
+    const data = await StoreRating.find({ storeId }).exec();
+    const avg = (
+      data.reduce((prev, item) => prev + item.rate, 0) / data.length
+    ).toFixed(1);
+    response.json({
+      total: data.length,
+      list: data,
+      avg,
+    });
+  } catch (error) {
+    response.status(400).json({
+      message: error.message,
+    });
+  }
+};

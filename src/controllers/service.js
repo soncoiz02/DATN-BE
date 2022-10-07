@@ -114,7 +114,7 @@ export const search = async (req, res) => {
 export const sort = async (req, res) => {
   try {
     const service = await Service.find({}).exec();
-    let rated = await ServiceRating.find({}).exec();
+    const rated = await ServiceRating.find({}).exec();
     const steps = await ServiceStep.find({}).exec();
     const newService = service.map((item) => {
       const serviceRated = rated.filter((rate) =>
@@ -182,7 +182,7 @@ export const getServiceByStore = async (req, res) => {
           from: 'serviceratings',
           foreignField: 'serviceId',
           localField: '_id',
-          as: 'rated',
+          as: 'rate',
         },
       },
       {
@@ -220,7 +220,7 @@ export const filter = async (req, res) => {
         price: { $gte: parseInt(req.query.price) },
       }).exec();
     }
-    let rated = await ServiceRating.find({}).exec();
+    const rated = await ServiceRating.find({}).exec();
     const steps = await ServiceStep.find({}).exec();
     let newService = service.map((item) => {
       const serviceRated = rated.filter((rate) =>
