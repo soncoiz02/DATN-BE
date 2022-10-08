@@ -17,7 +17,6 @@ const categoryService = new Schema(
   },
   { timestamps: true }
 );
-
 categoryService.index({ '$**': 'text' });
 
 export default mongoose.model('Category', categoryService);
