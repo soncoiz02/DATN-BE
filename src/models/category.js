@@ -1,16 +1,14 @@
 import mongoose, { Schema, ObjectId } from 'mongoose';
 
-const categoryServiece = new Schema(
+const categoryService = new Schema(
   {
     name: {
       type: String,
       required: true,
     },
-    slug: {
-      type: String,
-      lowercase: true,
-      unique: true,
-      index: true,
+    status: {
+      type: Number,
+      required: true,
     },
     storeId: {
       type: ObjectId,
@@ -20,6 +18,6 @@ const categoryServiece = new Schema(
   { timestamps: true }
 );
 
-categoryServiece.index({ '$**': 'text' });
+categoryService.index({ '$**': 'text' });
 
-export default mongoose.model('Category', categoryServiece);
+export default mongoose.model('Category', categoryService);

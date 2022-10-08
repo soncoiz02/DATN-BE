@@ -52,24 +52,20 @@ export const remove = async (request, response) => {
     });
   }
 };
+
 export const update = async (request, response) => {
-  const condition = { slug: request.params.slug };
-  const document = request.body;
-  const options = { new: true };
+  const option = { new: true };
   try {
     const category = await Category.findOneAndUpdate(
-      condition,
-      document,
-      options
+      { _id: request.params.id },
+      request.body,
+      option
     ).exec();
     response.json(category);
   } catch (error) {
-    response.status(400).json({
-      message: error.message,
-    });
+    response.status(400).json({ message: error.message });
   }
 };
-
 export const searchCate = async (req, res) => {
   const searchString = req.query.q ? req.query.q : '';
 
