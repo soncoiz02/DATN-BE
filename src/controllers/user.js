@@ -1,4 +1,6 @@
+import mongoose from 'mongoose';
 import User from '../models/user';
+import StoreMemberShip from '../models/storeMemberShip';
 
 // eslint-disable-next-line import/prefer-default-export
 export const GetoneUser = async (request, response) => {
@@ -31,7 +33,6 @@ export const listUser = async (req, response) => {
       .populate('roleId', 'name')
       .exec();
     response.json(user);
-    console.log(user);
   } catch (error) {
     return response.status(400).json({
       message: error.message,
@@ -80,6 +81,36 @@ export const createRoleUser = async (request, response) => {
     response.json(user);
   } catch (error) {
     response.status(400).json({ message: error.message });
+    console.log(error);
+  }
+};
+
+export const getStoreStaff = async (req, res) => {
+  try {
+    const storeId = req.params.id;
+    const users = await User.aggregate([
+      {
+        $lookup: {
+          from: 'storememberships',
+          localField: '_id',
+          foreignField: 'userId',
+          as: 'storeMember',
+        },
+      },
+      {
+        $match: {
+          'storeMember.storeId': new mongoose.Types.ObjectId(storeId),
+          roleId: new mongoose.Types.ObjectId('6336719e9f0cdce7e66cba16'),
+        },
+      },
+      {
+        $project: {
+          storeMember: 0,
+        },
+      },
+    ]);
+    res.json(users);
+  } catch (error) {
     console.log(error);
   }
 };

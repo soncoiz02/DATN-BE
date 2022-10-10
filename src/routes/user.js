@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import {
   GetoneUser,
+  getStoreStaff,
   listUser,
   removeUser,
   updateUser,
@@ -13,5 +14,6 @@ router.get('/user', listUser);
 router.put('/user/:id', updateUser);
 
 router.delete('/user/:id', removeUser);
+router.get('/store-staff/:id', getStoreStaff);
 
 export default router;

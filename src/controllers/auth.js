@@ -1,6 +1,6 @@
 import Jwt from 'jsonwebtoken';
+import StoreMemberShip from '../models/storeMemberShip';
 import User from '../models/user';
-import UserRole from '../models/userRole';
 // eslint-disable-next-line import/prefer-default-export, consistent-return
 export const register = async (request, response) => {
   const { email, username, password, birthday, phone, name, avt, roleId } =
@@ -10,7 +10,8 @@ export const register = async (request, response) => {
     const exitUser = await User.findOne({ username }).exec();
     if (exitUser) {
       return response.status(400).json({
-        message: 'Account existed',
+        field: 'username',
+        message: 'Tài khoản đã tồn tại',
       });
     }
     const user = await new User({
@@ -50,31 +51,49 @@ export const register = async (request, response) => {
 export const login = async (request, response) => {
   const { username, password } = request.body;
   try {
-    const user = await User.findOne({ username }).exec();
+    const user = await User.findOne({ username }).populate('roleId').exec();
     if (!user) {
       return response.status(400).json({
-        message: 'User does not exist',
+        field: 'username',
+        message: 'Sai tên đăng nhập',
       });
     }
     if (!user.authenticate(password)) {
       return response.status(400).json({
-        message: 'Password is wrong',
+        field: 'password',
+        message: 'Sai mật khẩu',
       });
     }
     const token = Jwt.sign({ _id: user.id }, '123456', {
       expiresIn: 60 * 60 * 24,
     });
+
+    const userData = {
+      _id: user._id,
+      name: user.name,
+      username: user.username,
+      birthday: user.birthday,
+      phone: user.phone,
+      email: user.email,
+      avt: user.avt,
+      roleId: user.roleId,
+    };
+
+    if (user.roleId.name === 'Admin' || user.roleId.name === 'Staff') {
+      const storeMember = await StoreMemberShip.findOne({
+        userId: user._id,
+      }).exec();
+      return response.json({
+        token,
+        user: {
+          ...userData,
+          storeId: storeMember.storeId,
+        },
+      });
+    }
     response.json({
       token,
-      user: {
-        name: user.name,
-        username: user.username,
-        birthday: user.birthday,
-        phone: user.phone,
-        email: user.email,
-        avt: user.avt,
-        roleId: user.roleId,
-      },
+      user: userData,
     });
   } catch (error) {
     response.status(400).json({

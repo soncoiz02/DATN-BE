@@ -2,8 +2,9 @@ import { Router } from 'express';
 import {
   create,
   filterByStatus,
-  getFutureOrder,
+  getFutureOrderByStore,
   getOrderByDate,
+  getOrderByStaffCategory,
   getOrderByUser,
   list,
   read,
@@ -30,6 +31,8 @@ route.get('/getOrderByDate', getOrderByDate);
 
 route.get('/getOrderByUserAndDate', getOrderByUser);
 
-route.get('/getFutureOrder', getFutureOrder);
+route.get('/getFutureOrderByStore/:id', getFutureOrderByStore);
+
+route.get('/getOrderByStaffCategory', getOrderByStaffCategory);
 
 export default route;
