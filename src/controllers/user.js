@@ -55,7 +55,7 @@ export const updateUser = async (request, response) => {
   const option = { new: true };
   try {
     const user = await User.findOneAndUpdate(
-      { id: request.params.id },
+      { _id: request.params.id },
       request.body,
       option
     )

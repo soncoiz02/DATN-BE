@@ -82,7 +82,7 @@ export const updateStore = async (request, response) => {
   const option = { new: true };
   try {
     const store = await Store.findOneAndUpdate(
-      { id: request.params.id },
+      { _id: request.params.id },
       request.body,
       option
     ).exec();

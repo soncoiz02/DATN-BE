@@ -44,12 +44,11 @@ export const remove = async (request, response) => {
   }
 };
 export const update = async (request, response) => {
-  const condition = { slug: request.params.slug };
   const document = request.body;
   const options = { new: true };
   try {
     const orderStatus = await OrderStatus.findOneAndUpdate(
-      condition,
+      { _id: request.params.id },
       document,
       options
     ).exec();

@@ -53,13 +53,11 @@ export const remove = async (request, response) => {
   }
 };
 export const update = async (request, response) => {
-  const condition = { slug: request.params.slug };
-  const document = request.body;
   const options = { new: true };
   try {
     const category = await Category.findOneAndUpdate(
-      condition,
-      document,
+      { _id: request.params.id },
+      request.body,
       options
     ).exec();
     response.json(category);

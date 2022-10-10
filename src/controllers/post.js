@@ -45,12 +45,11 @@ export const remove = async (request, response) => {
 };
 
 export const update = async (request, response) => {
-  const condition = { _id: request.params.id };
   const document = request.body;
   const options = { new: true };
   try {
     const post = await Post.findOneAndUpdate(
-      condition,
+      { _id: request.params.id },
       document,
       options
     ).exec();
