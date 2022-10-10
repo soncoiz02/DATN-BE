@@ -44,7 +44,7 @@ export const update = async (request, response) => {
   const option = { new: true };
   try {
     const userNotify = await UserNotify.findOneAndUpdate(
-      { id: request.params.id },
+      { _id: request.params.id },
       request.body,
       option
     ).exec();
