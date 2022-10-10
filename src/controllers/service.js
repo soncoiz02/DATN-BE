@@ -199,7 +199,7 @@ export const getServiceByStore = async (req, res) => {
   }
 };
 
-export const filter = async (req, res) => {
+export const filterByCatePrice = async (req, res) => {
   try {
     if (req.query.categoryId === undefined) {
       return res.json({ msg: 'categoryId is required' });
@@ -215,10 +215,22 @@ export const filter = async (req, res) => {
     }).exec();
     if (req.query.price !== undefined) {
       // console.log("price: " + req.query.price);
-      service = await Service.find({
-        categoryId: req.query.categoryId,
-        price: { $gte: parseInt(req.query.price) },
-      }).exec();
+      if (req.query.price.indexOf('~') > 0) {
+        let _price = req.query.price.split('~');
+        // console.log("_price: " + _price);
+        service = await Service.find({
+          categoryId: req.query.categoryId,
+          price: {
+            $gte: parseInt(_price[0]),
+            $lte: parseInt(_price[1]),
+          },
+        }).exec();
+      } else {
+        service = await Service.find({
+          categoryId: req.query.categoryId,
+          price: { $gte: parseInt(req.query.price) },
+        }).exec();
+      }
     }
     let rated = await ServiceRating.find({}).exec();
     const steps = await ServiceStep.find({}).exec();
@@ -242,11 +254,21 @@ export const filter = async (req, res) => {
       };
     });
     if (req.query.rated !== undefined) {
-      // console.log("rated: " + parseFloat(req.query.rated));
-      newService = newService.filter(
-        (service) =>
-          parseFloat(service.rated.avg) >= parseFloat(req.query.rated)
-      );
+      // console.log("rated: " + req.query.rated);
+      if (req.query.rated.indexOf('~') > 0) {
+        let _rated = req.query.rated.split('~');
+        // console.log("_rated: " + _rated);
+        newService = newService.filter(
+          (service) =>
+            parseFloat(service.rated.avg) >= parseFloat(_rated[0]) &&
+            parseFloat(service.rated.avg) <= parseFloat(_rated[1])
+        );
+      } else {
+        newService = newService.filter(
+          (service) =>
+            parseFloat(service.rated.avg) >= parseFloat(req.query.rated)
+        );
+      }
     }
     res.json(newService);
   } catch (error) {
