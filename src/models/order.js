@@ -32,6 +32,11 @@ const serviceSchema = new Schema(
       type: ObjectId,
       ref: 'User',
     },
+    staff: {
+      type: ObjectId,
+      ref: 'User',
+      default: null,
+    },
   },
   { timestamps: true }
 );
