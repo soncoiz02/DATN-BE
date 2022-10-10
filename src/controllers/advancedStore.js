@@ -24,6 +24,19 @@ export const listStoreByName = async (request, response) => {
   }
 };
 
+export const searchByAddress = async (request, response) => {
+  try {
+    const search = await Store.find({
+      address: { $regex: request.query.key, $options: 'si' },
+    });
+    response.json(search);
+  } catch (error) {
+    response.status(400).json({
+      message: error.message,
+    });
+  }
+};
+
 export const sortByRated = async (request, response) => {
   try {
     const store = await Store.find({}).exec();
