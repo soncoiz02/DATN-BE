@@ -22,6 +22,7 @@ import storeMemberShip from './routes/storeMemberShip';
 import storeRatingRouter from './routes/storeRating';
 import userRole from './routes/userRole';
 import UserNotifyRoute from './routes/usernotify';
+import StaffRoute from './routes/staff';
 
 const app = express();
 const swaggerJSDocs = YAML.load('./api.yaml');
@@ -47,6 +48,7 @@ app.use('/api', storeMemberShip);
 app.use('/api', storeRatingRouter);
 app.use('/api', UserNotifyRoute);
 app.use('/api', userRole);
+app.use('/api', StaffRoute);
 
 mongoose
   .connect(process.env.MONGODB_URI)
