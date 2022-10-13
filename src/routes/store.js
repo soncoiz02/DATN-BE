@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import {
+  filterByRate,
   listStoreByName,
+  searchByAddress,
   searchStore,
   sortByRated,
 } from '../controllers/advancedStore';
@@ -17,11 +19,12 @@ const router = Router();
 
 router.post('/store', createStore);
 router.get('/store', listStore);
+router.get('/searchName', searchStore);
+router.get('/searchAddress', searchByAddress);
+router.get('/store/storeName', listStoreByName);
+router.get('/sortByRated', sortByRated);
+router.get('/filterByRated', filterByRate);
 router.get('/store/:id', storeDetail);
 router.delete('/store/:id', deleteStore);
 router.put('/store/:id', updateStore);
-router.get('/search', searchStore);
-router.get('/storeName', listStoreByName);
-router.get('/sortByRated', sortByRated);
-
 export default router;
