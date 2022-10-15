@@ -1,5 +1,6 @@
 import { endOfDay, startOfDay, startOfToday } from 'date-fns';
 import mongoose from 'mongoose';
+import ActivityLog from '../models/activityLog';
 import Order from '../models/order';
 import Service from '../models/service';
 import Staff from '../models/staff';
@@ -100,7 +101,17 @@ export const create = async (req, res) => {
     const detailOrder = await Order.findById(newOrder._id)
       .populate('status')
       .populate('serviceId', 'name desc price image duration status')
+      .populate('userId')
       .exec();
+
+    const firstActivityLog = {
+      content: `Đăng ký dịch vụ`,
+      userId: detailOrder.userId,
+      orderId: detailOrder._id,
+    };
+
+    await new ActivityLog(firstActivityLog).save();
+
     res.json(detailOrder);
   } catch (error) {
     res.status(400).json({
@@ -155,7 +166,13 @@ export const read = async (req, res) => {
       .populate('serviceId')
       .populate('staff')
       .exec();
-    res.json(order);
+    const activities = await ActivityLog.find({ orderId: req.params.id })
+      .populate('userId')
+      .exec();
+    res.json({
+      ...order._doc,
+      activityLog: activities,
+    });
   } catch (error) {
     res.status(400).json({
       message: error.message,
