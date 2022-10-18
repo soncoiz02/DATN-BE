@@ -24,6 +24,7 @@ import userRole from './routes/userRole';
 import UserNotifyRoute from './routes/usernotify';
 import StaffRoute from './routes/staff';
 import ActivityLog from './routes/activityLog';
+import billRouter from './routes/bill';
 
 const app = express();
 const swaggerJSDocs = YAML.load('./api.yaml');
@@ -51,6 +52,7 @@ app.use('/api', UserNotifyRoute);
 app.use('/api', userRole);
 app.use('/api', StaffRoute);
 app.use('/api', ActivityLog);
+app.use('/api', billRouter);
 
 mongoose
   .connect(process.env.MONGODB_URI)
