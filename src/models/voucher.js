@@ -28,7 +28,7 @@ const voucherSchema = new Schema(
       type: Date,
       required: true,
     },
-    usedIs: {
+    isUsed: {
       type: Boolean,
       required: true,
     },
