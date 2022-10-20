@@ -25,6 +25,8 @@ import UserNotifyRoute from './routes/usernotify';
 import StaffRoute from './routes/staff';
 import ActivityLog from './routes/activityLog';
 
+import VoucherRoute from './routes/voucher';
+
 const app = express();
 const swaggerJSDocs = YAML.load('./api.yaml');
 
@@ -51,7 +53,7 @@ app.use('/api', UserNotifyRoute);
 app.use('/api', userRole);
 app.use('/api', StaffRoute);
 app.use('/api', ActivityLog);
-
+app.use('/api', VoucherRoute);
 mongoose
   .connect(process.env.MONGODB_URI)
   .then(() => console.log('Database connected'))
