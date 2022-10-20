@@ -163,8 +163,20 @@ export const read = async (req, res) => {
   try {
     const order = await Order.findOne({ _id: req.params.id })
       .populate('status')
-      .populate('serviceId')
+      .populate({
+        path: 'serviceId',
+        model: 'Service',
+        populate: {
+          path: 'categoryId',
+          model: 'Category',
+          populate: {
+            path: 'storeId',
+            model: 'Store',
+          },
+        },
+      })
       .populate('staff')
+      .populate('userId')
       .exec();
     const activities = await ActivityLog.find({ orderId: req.params.id })
       .populate('userId')

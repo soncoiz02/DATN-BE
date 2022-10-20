@@ -93,7 +93,7 @@ export const getStaffInTimeSlot = async (req, res) => {
       }
     }
 
-    res.json(order);
+    res.json(listStaff);
   } catch (error) {
     res.status(400).json({
       message: error.message,
