@@ -7,13 +7,11 @@ const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
     type: 'OAuth2',
-    user: 'soncoiz3107@gmail.com',
-    pass: 'Soncoiz02!',
-    clientId:
-      '703579968493-uticdlqnqmbm6p2q8lg4r4f86987qlec.apps.googleusercontent.com',
-    clientSecret: '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',
-    refreshToken:
-      '1//04B1dUeTUbbSLCgYIARAAGAQSNwF-L9IraCqNPpRlg4xqXi9c4ucq9IB1dDyFKktslxW1ebHKGZzQJPkf6LMcrSKEzXs-U9rbqWE',
+    user: process.env.EMAIL,
+    pass: process.env.EMAIL_PASSWORD,
+    clientId: process.env.GOOGLE_CLOUD_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLOUD_CLIENT_SECRET,
+    refreshToken: process.env.GOOGLE_CLOUD_REFRESH_TOKEN,
   },
 });
 
@@ -43,12 +41,12 @@ export const getOne = async (req, res) => {
 export const create = async (req, res) => {
   try {
     const { billData, activityLog, emailOption } = req.body;
-    const bill = await new Bill(billData).save();
-    await Order.findOneAndUpdate(
-      { _id: billData.order },
-      { status: '634e59b757b7ea792917962c' }
-    ).exec();
-    await new ActivityLog(activityLog).save();
+    // const bill = await new Bill(billData).save();
+    // await Order.findOneAndUpdate(
+    //   { _id: billData.order },
+    //   { status: '634e59b757b7ea792917962c' }
+    // ).exec();
+    // await new ActivityLog(activityLog).save();
     transporter.sendMail(emailOption, (error, info) => {
       if (error) {
         console.log(error);
@@ -56,7 +54,7 @@ export const create = async (req, res) => {
         console.log(`Email sent: ${info.response}`);
       }
     });
-    res.json(bill);
+    // res.json(bill);
   } catch (error) {
     res.status(400).json({
       message: error.message,

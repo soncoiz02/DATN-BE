@@ -19,6 +19,9 @@ const serviceSchema = new Schema(
       phone: {
         type: String,
       },
+      email: {
+        type: String,
+      },
     },
     status: {
       type: ObjectId,
