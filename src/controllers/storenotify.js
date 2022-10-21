@@ -42,7 +42,7 @@ export const updateStore = async (request, response) => {
   const option = { new: true };
   try {
     const storeNotify = await StoreNotify.findOneAndUpdate(
-      { id: request.params.id },
+      { _id: request.params.id },
       request.body,
       option
     ).exec();

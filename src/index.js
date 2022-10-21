@@ -26,6 +26,8 @@ import StaffRoute from './routes/staff';
 import ActivityLog from './routes/activityLog';
 import BillRoute from './routes/bill';
 
+import VoucherRoute from './routes/voucher';
+
 const app = express();
 const swaggerJSDocs = YAML.load('./api.yaml');
 
@@ -53,7 +55,7 @@ app.use('/api', userRole);
 app.use('/api', StaffRoute);
 app.use('/api', ActivityLog);
 app.use('/api', BillRoute);
-
+app.use('/api', VoucherRoute);
 mongoose
   .connect(process.env.MONGODB_URI)
   .then(() => console.log('Database connected'))

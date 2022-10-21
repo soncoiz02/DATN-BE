@@ -19,6 +19,18 @@ export const list = async (request, response) => {
     response.status(400).json({ message: error.message });
   }
 };
+export const update = async (request, response) => {
+  try {
+    const userRole = await UserRole.findOneAndUpdate(
+      { _id: request.params.id },
+      request.body,
+      { new: true }
+    );
+    response.json(userRole);
+  } catch (error) {
+    response.status(400).json({ message: error.message });
+  }
+};
 export const remove = async (request, response) => {
   try {
     const userRole = await UserRole.findOneAndDelete({
