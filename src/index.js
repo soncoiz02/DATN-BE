@@ -24,6 +24,7 @@ import userRole from './routes/userRole';
 import UserNotifyRoute from './routes/usernotify';
 import StaffRoute from './routes/staff';
 import ActivityLog from './routes/activityLog';
+import BillRoute from './routes/bill';
 
 import VoucherRoute from './routes/voucher';
 
@@ -53,6 +54,7 @@ app.use('/api', UserNotifyRoute);
 app.use('/api', userRole);
 app.use('/api', StaffRoute);
 app.use('/api', ActivityLog);
+app.use('/api', BillRoute);
 app.use('/api', VoucherRoute);
 mongoose
   .connect(process.env.MONGODB_URI)
