@@ -1,6 +1,8 @@
 import Store from '../models/store';
 import Category from '../models/category';
 import storeRating from '../models/storeRating';
+import Order from '../models/order';
+import Service from '../models/service';
 // eslint-disable-next-line import/prefer-default-export
 export const createStore = async (request, response) => {
   try {
@@ -87,6 +89,58 @@ export const updateStore = async (request, response) => {
       option
     ).exec();
     response.json(store);
+  } catch (error) {
+    response.status(400).json({ message: error.message });
+  }
+};
+
+export const storeRevenue = async (request, response) => {
+  try {
+    // console.log("storeId: " + request.params.id);
+    const category = await Category.find({ storeId: request.params.id }).exec();
+    // console.log("categoryId: " + category[0]._id);
+    const service = await Service.find({ categoryId: category[0]._id }).exec();
+    let serviceIds = [];
+    for (let i = 0; i < service.length; i++) {
+      serviceIds.push(service[i]['_id']);
+    }
+    // console.log("serviceIds: " + serviceIds);
+
+    const _order = await Order.find({})
+      .populate('status', 'type')
+      .populate('serviceId', 'price');
+
+    const order = _order.filter(
+      (order) =>
+        serviceIds.some((_serviceId) =>
+          _serviceId.equals(order.serviceId._id)
+        ) && order.status.type === 'done'
+    );
+
+    let _total = 0;
+    let _shouldCount = true;
+    let _totalByService = [];
+    for (let i = 0; i < serviceIds.length; i++) {
+      let _item = {};
+      _item.serviceId = serviceIds[i];
+      _item.serviceRevenue = 0;
+      for (let j = 0; j < order.length; j++) {
+        if (serviceIds[i].equals(order[j].serviceId._id)) {
+          _item.serviceRevenue += order[j].serviceId.price;
+        }
+
+        if (_shouldCount === true) {
+          _total += order[j].serviceId.price;
+        }
+      }
+      _shouldCount = false;
+      _totalByService.push(_item);
+    }
+    response.json({
+      storeId: request.params.id,
+      revenue: _total,
+      services: _totalByService,
+    });
   } catch (error) {
     response.status(400).json({ message: error.message });
   }
