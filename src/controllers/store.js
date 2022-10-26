@@ -98,11 +98,19 @@ export const storeRevenue = async (request, response) => {
   try {
     // console.log("storeId: " + request.params.id);
     const category = await Category.find({ storeId: request.params.id }).exec();
-    // console.log("categoryId: " + category[0]._id);
-    const service = await Service.find({ categoryId: category[0]._id }).exec();
+    // console.log("category: " + category);
+
     let serviceIds = [];
-    for (let i = 0; i < service.length; i++) {
-      serviceIds.push(service[i]['_id']);
+    for (let i = 0; i < category.length; i++) {
+      if (category[i].name === 'Danh mục không xác định') {
+        continue;
+      }
+      const service = await Service.find({
+        categoryId: category[i]._id,
+      }).exec();
+      for (let i = 0; i < service.length; i++) {
+        serviceIds.push(service[i]['_id']);
+      }
     }
     // console.log("serviceIds: " + serviceIds);
 
@@ -117,20 +125,24 @@ export const storeRevenue = async (request, response) => {
         ) && order.status.type === 'done'
     );
 
-    let _total = 0;
+    let _totalRevenue = 0;
+    let _totalOrders = 0;
     let _shouldCount = true;
     let _totalByService = [];
     for (let i = 0; i < serviceIds.length; i++) {
       let _item = {};
       _item.serviceId = serviceIds[i];
       _item.serviceRevenue = 0;
+      _item.serviceOrder = 0;
       for (let j = 0; j < order.length; j++) {
         if (serviceIds[i].equals(order[j].serviceId._id)) {
           _item.serviceRevenue += order[j].serviceId.price;
+          _item.serviceOrder += 1;
         }
 
         if (_shouldCount === true) {
-          _total += order[j].serviceId.price;
+          _totalRevenue += order[j].serviceId.price;
+          _totalOrders += 1;
         }
       }
       _shouldCount = false;
@@ -138,7 +150,8 @@ export const storeRevenue = async (request, response) => {
     }
     response.json({
       storeId: request.params.id,
-      revenue: _total,
+      revenue: _totalRevenue,
+      orders: _totalOrders,
       services: _totalByService,
     });
   } catch (error) {
