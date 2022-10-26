@@ -7,11 +7,13 @@ const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
     type: 'OAuth2',
-    user: process.env.EMAIL,
-    pass: process.env.EMAIL_PASSWORD,
-    clientId: process.env.GOOGLE_CLOUD_CLIENT_ID,
-    clientSecret: process.env.GOOGLE_CLOUD_CLIENT_SECRET,
-    refreshToken: process.env.GOOGLE_CLOUD_REFRESH_TOKEN,
+    user: 'beautyparadise1102@gmail.com',
+    pass: 'soncoiz02',
+    clientId:
+      '703579968493-uticdlqnqmbm6p2q8lg4r4f86987qlec.apps.googleusercontent.com',
+    clientSecret: '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',
+    refreshToken:
+      '1//04eJ17ItAFDF9CgYIARAAGAQSNwF-L9Ir1IB-x43fXo7sD8AwlK2FKvVrxzJKe8ofdyxLrCiCmrrhA9FthtqA9h2vjsXHbouzEmI',
   },
 });
 

@@ -77,7 +77,9 @@ export const update = async (req, res) => {
 
 export const read = async (req, res) => {
   try {
-    const service = await Service.findOne({ _id: req.params.id }).exec();
+    const service = await Service.findOne({ _id: req.params.id })
+      .populate('categoryId')
+      .exec();
     const rated = await ServiceRating.find({ serviceId: req.params.id }).exec();
     const steps = await ServiceStep.find({ serviceId: req.params.id }).exec();
     const ratedAvg =
@@ -187,6 +189,13 @@ export const getServiceByStore = async (req, res) => {
       },
       {
         $match: {
+          'categories._id': {
+            $ne: new mongoose.Types.ObjectId('63518497a3ca43d2916000cc'),
+          },
+        },
+      },
+      {
+        $match: {
           'stores._id': new mongoose.Types.ObjectId(req.params.id),
         },
       },
@@ -216,7 +225,7 @@ export const filterByCatePrice = async (req, res) => {
     if (req.query.price !== undefined) {
       // console.log("price: " + req.query.price);
       if (req.query.price.indexOf('~') > 0) {
-        let _price = req.query.price.split('~');
+        const _price = req.query.price.split('~');
         // console.log("_price: " + _price);
         service = await Service.find({
           categoryId: req.query.categoryId,
@@ -256,7 +265,7 @@ export const filterByCatePrice = async (req, res) => {
     if (req.query.rated !== undefined) {
       // console.log("rated: " + req.query.rated);
       if (req.query.rated.indexOf('~') > 0) {
-        let _rated = req.query.rated.split('~');
+        const _rated = req.query.rated.split('~');
         // console.log("_rated: " + _rated);
         newService = newService.filter(
           (service) =>

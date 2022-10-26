@@ -6,6 +6,9 @@ import http from 'http';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import mongoose from 'mongoose';
+
+import { Server } from 'socket.io';
+
 import serviceRatingRouter from './routes/serviceRating';
 import storeRouter from './routes/store';
 import categoryRouter from './routes/category';
@@ -25,7 +28,6 @@ import UserNotifyRoute from './routes/usernotify';
 import StaffRoute from './routes/staff';
 import ActivityLog from './routes/activityLog';
 import BillRoute from './routes/bill';
-
 import VoucherRoute from './routes/voucher';
 
 const app = express();
@@ -33,6 +35,14 @@ const swaggerJSDocs = YAML.load('./api.yaml');
 
 const server = http.createServer(app);
 dotenv.config();
+
+const io = new Server(server, {
+  cors: {
+    origin: process.env.CLIENT_URL,
+    methods: ['GET, POST'],
+  },
+});
+
 app.use(cors());
 app.use(express.json());
 app.use('/api', serviceRatingRouter);
@@ -56,6 +66,15 @@ app.use('/api', StaffRoute);
 app.use('/api', ActivityLog);
 app.use('/api', BillRoute);
 app.use('/api', VoucherRoute);
+
+io.of('/order').on('connection', (socket) => {
+  console.log('socket connected');
+  socket.on('send-notify', (data) => {
+    io.of('/order').emit('receive-new-order', data.storeId);
+    io.of('/order').emit('receive-notify', data);
+  });
+});
+
 mongoose
   .connect(process.env.MONGODB_URI)
   .then(() => console.log('Database connected'))

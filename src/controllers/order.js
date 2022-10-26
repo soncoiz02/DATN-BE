@@ -6,6 +6,7 @@ import Service from '../models/service';
 import Staff from '../models/staff';
 import User from '../models/user';
 import { dateToHourNumber } from '../utils/dateToHourNumber';
+import roundedNumber from '../utils/roundedNumber';
 
 // eslint-disable-next-line import/prefer-default-export
 export const create = async (req, res) => {
@@ -44,6 +45,9 @@ export const create = async (req, res) => {
             $gte: startOfDate,
             $lte: endOfDate,
           },
+          status: {
+            $ne: new mongoose.Types.ObjectId('632bc765dc2a7f68a3f383eb'),
+          },
         },
       },
       {
@@ -68,19 +72,32 @@ export const create = async (req, res) => {
 
     const listStaff = [];
 
-    const duration = (service.duration + 15) / 60;
+    const duration = +roundedNumber((service.duration + 15) / 60);
     const startTime = +timeSlot;
     const endTime = +timeSlot + duration;
 
     for (let i = 0; i < order.length; i++) {
-      const orderStartTime = dateToHourNumber(order[i].startDate);
-      const orderEndTime = dateToHourNumber(order[i].endDate);
+      const orderStartTime = roundedNumber(
+        dateToHourNumber(order[i].startDate)
+      );
+      const orderEndTime = roundedNumber(dateToHourNumber(order[i].endDate));
+
+      console.log({
+        startTime,
+        orderStartTime,
+        endTime,
+        orderEndTime,
+        duration,
+      });
       if (
-        (orderEndTime > startTime && orderEndTime - startTime <= duration) ||
-        (orderStartTime < endTime && endTime - orderStartTime <= duration)
+        (orderEndTime >= startTime &&
+          roundedNumber(orderEndTime - startTime) <= duration) ||
+        (orderStartTime <= endTime &&
+          roundedNumber(endTime - orderStartTime) <= duration)
       ) {
-        if (listStaff.includes(order[i].staff.toString())) continue;
-        else listStaff.push(order[i].staff.toString());
+        if (listStaff.includes(order[i].staff.toString())) return;
+        listStaff.push(order[i].staff.toString());
+        console.log('good');
       }
     }
 
@@ -259,7 +276,9 @@ export const getOrderByUser = async (req, res) => {
         $gte: startDay,
         $lte: endDay,
       },
-      status: { $ne: '632bc765dc2a7f68a3f383eb' },
+      status: {
+        $ne: '632bc765dc2a7f68a3f383eb',
+      },
       'infoUser.phone': userPhone,
     }).exec();
     const orderEndTime = order.map((item) => {
@@ -375,7 +394,7 @@ export const getOrderByStaffCategory = async (req, res) => {
     }).exec();
     const totalStaff = staffCategory.length;
 
-    const serviceDuration = (service.duration + 15) / 60;
+    const serviceDuration = roundedNumber((service.duration + 15) / 60);
     const serviceTimeSlot = service.timeSlot;
 
     const order = await Order.aggregate([
@@ -384,6 +403,9 @@ export const getOrderByStaffCategory = async (req, res) => {
           startDate: {
             $gte: startDay,
             $lte: endDay,
+          },
+          status: {
+            $ne: new mongoose.Types.ObjectId('632bc765dc2a7f68a3f383eb'),
           },
         },
       },
@@ -413,17 +435,16 @@ export const getOrderByStaffCategory = async (req, res) => {
         const orderStartDate = new Date(order[j].startDate);
         const orderEndDate = new Date(order[j].endDate);
 
-        const orderStartTime = dateToHourNumber(orderStartDate);
-        const orderEndTime = dateToHourNumber(orderEndDate);
-
-        // console.log({ timeSlot: serviceTimeSlot[i], orderStartTime, orderEndTime });
+        const orderStartTime = roundedNumber(dateToHourNumber(orderStartDate));
+        const orderEndTime = roundedNumber(dateToHourNumber(orderEndDate));
 
         if (
           (serviceTimeSlot[i] <= orderEndTime &&
-            orderEndTime - serviceTimeSlot <= serviceDuration) ||
+            roundedNumber(orderEndTime - serviceTimeSlot) <= serviceDuration) ||
           (serviceTimeSlot[i] + serviceDuration >= orderStartTime &&
-            serviceTimeSlot[i] + serviceDuration - orderStartTime <=
-              serviceDuration)
+            roundedNumber(
+              serviceTimeSlot[i] + serviceDuration - orderStartTime
+            ) <= serviceDuration)
         ) {
           count++;
         }
@@ -435,7 +456,7 @@ export const getOrderByStaffCategory = async (req, res) => {
       (item) => item === totalStaff
     );
 
-    res.json(checkDisableTimeSlot);
+    res.json(totalStaff);
   } catch (error) {
     res.status(400).json({
       message: error.message,
