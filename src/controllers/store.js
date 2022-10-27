@@ -99,7 +99,6 @@ export const storeRevenue = async (request, response) => {
     // console.log("storeId: " + request.params.id);
     const category = await Category.find({ storeId: request.params.id }).exec();
     // console.log("category: " + category);
-
     let serviceIds = [];
     for (let i = 0; i < category.length; i++) {
       if (category[i].name === 'Danh mục không xác định') {
@@ -116,7 +115,7 @@ export const storeRevenue = async (request, response) => {
 
     const _order = await Order.find({})
       .populate('status', 'type')
-      .populate('serviceId', 'price');
+      .populate('serviceId', 'price name');
 
     const order = _order.filter(
       (order) =>
@@ -134,10 +133,12 @@ export const storeRevenue = async (request, response) => {
       _item.serviceId = serviceIds[i];
       _item.serviceRevenue = 0;
       _item.serviceOrder = 0;
+      _item.nameService = '';
       for (let j = 0; j < order.length; j++) {
         if (serviceIds[i].equals(order[j].serviceId._id)) {
           _item.serviceRevenue += order[j].serviceId.price;
           _item.serviceOrder += 1;
+          _item.nameService = order[j].serviceId.name;
         }
 
         if (_shouldCount === true) {
