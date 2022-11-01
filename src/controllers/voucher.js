@@ -67,6 +67,7 @@ export const search = async (req, res) => {
     $text: { $search: searchString },
   }).exec();
   res.json(result);
+};
 
 export const getUserVoucher = async (req, res) => {
   try {
