@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { decode } from 'jsonwebtoken';
 import User from '../models/user';
 import StoreMemberShip from '../models/storeMemberShip';
 
@@ -52,17 +53,13 @@ export const removeUser = async (request, response) => {
     response.status(400).json({ message: 'Không thể xóa' });
   }
 };
-export const updateUser = async (request, response) => {
-  const option = { new: true };
+export const updateUser = async (req, res) => {
   try {
-    const user = await User.findOneAndUpdate(
-      { _id: request.params.id },
-      request.body,
-      option
-    )
+    const userId = decode(req.token)._id;
+    const user = await User.findOneAndUpdate({ _id: userId }, req.body)
       .populate('roleId', 'name')
       .exec();
-    response.json({
+    res.json({
       username: user.username,
       name: user.name,
       birthday: user.birthday,
@@ -72,7 +69,7 @@ export const updateUser = async (request, response) => {
       roleId: user.roleId,
     });
   } catch (error) {
-    response.status(400).json({ message: error.message });
+    res.status(400).json({ message: error.message });
   }
 };
 export const createRoleUser = async (request, response) => {
