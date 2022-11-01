@@ -1,3 +1,4 @@
+import { decode } from 'jsonwebtoken';
 import Voucher from '../models/voucher';
 
 export const create = async (req, res) => {
@@ -66,4 +67,18 @@ export const search = async (req, res) => {
     $text: { $search: searchString },
   }).exec();
   res.json(result);
+
+export const getUserVoucher = async (req, res) => {
+  try {
+    const userId = decode(req.token)._id;
+    const { storeId } = req.query;
+    const voucher = await Voucher.find({ userId, storeId, isUsed: false })
+      .populate('storeId')
+      .exec();
+    res.json(voucher);
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+    });
+  }
 };

@@ -41,10 +41,15 @@ export const read = async (request, response) => {
     });
   }
 };
+
 export const remove = async (request, response) => {
-  const condition = { _id: request.params.id };
   try {
-    const category = await Category.findOneAndDelete(condition).exec();
+    const category = await Service.updateMany(
+      { categoryId: request.params.id },
+      { $set: { categoryId: '63518497a3ca43d2916000cc' } },
+      { multi: true }
+    );
+    await Category.deleteOne({ _id: request.params.id });
     response.json(category);
   } catch (error) {
     response.status(400).json({
@@ -52,6 +57,7 @@ export const remove = async (request, response) => {
     });
   }
 };
+
 export const update = async (request, response) => {
   const condition = { _id: request.params.id };
   const document = request.body;
