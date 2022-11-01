@@ -6,6 +6,7 @@ import { dateToHourNumber } from '../utils/dateToHourNumber';
 import Service from '../models/service';
 import User from '../models/user';
 import roundedNumber from '../utils/roundedNumber';
+import service from '../models/service';
 
 export const createStaff = async (req, res) => {
   try {
@@ -20,7 +21,10 @@ export const createStaff = async (req, res) => {
 
 export const getAll = async (req, res) => {
   try {
-    const staffs = await Staff.find({}).exec();
+    const staffs = await Staff.find({})
+      .populate('staff')
+      .populate('category')
+      .exec();
     res.json(staffs);
   } catch (error) {
     res.status(400).json({
@@ -130,7 +134,7 @@ export const getStaffInTimeSlot = async (req, res) => {
 
 export const getStaffInTimeSlotAllService = async (req, res) => {
   try {
-    const { timeSlot, date } = req.query;
+    const { timeStart, date } = req.query;
     const storeId = req.params.id;
     const startOfDate = startOfDay(new Date(date));
     const endOfDate = endOfDay(new Date(date));
@@ -158,35 +162,20 @@ export const getStaffInTimeSlotAllService = async (req, res) => {
     // eslint-disable-next-line consistent-return
     const getOrders = async (service) => {
       try {
-        const order = await Order.aggregate([
-          {
-            $match: {
-              startDate: {
-                $gte: startOfDate,
-                $lte: endOfDate,
-              },
-              status: {
-                $ne: new mongoose.Types.ObjectId('632bc765dc2a7f68a3f383eb'),
-              },
-            },
+        const orders = await Order.find({
+          startDate: {
+            $gte: startOfDate.toISOString(),
+            $lte: endOfDate.toISOString(),
           },
-          {
-            $lookup: {
-              from: 'services',
-              foreignField: '_id',
-              localField: 'serviceId',
-              as: 'service',
-            },
+          status: {
+            $ne: new mongoose.Types.ObjectId('632bc765dc2a7f68a3f383eb'),
           },
-          {
-            $match: {
-              'service.categoryId': new mongoose.Types.ObjectId(
-                service.categoryId
-              ),
-            },
-          },
-        ]);
-        return order;
+          'servicesRegistered.service': new mongoose.Types.ObjectId(
+            service._id
+          ),
+        }).exec();
+
+        return orders;
       } catch (error) {
         res.status(400).json({
           message: error.message,
@@ -194,85 +183,81 @@ export const getStaffInTimeSlotAllService = async (req, res) => {
       }
     };
 
-    const orderOfStore = await Promise.all(
+    // eslint-disable-next-line consistent-return
+    const getServiceStaff = async (service) => {
+      try {
+        const staffs = await User.aggregate([
+          {
+            $lookup: {
+              from: 'staffs',
+              foreignField: 'staff',
+              localField: '_id',
+              as: 'staffs',
+            },
+          },
+          {
+            $match: {
+              'staffs.category': new mongoose.Types.ObjectId(
+                service.categoryId
+              ),
+            },
+          },
+        ]);
+
+        return staffs.length;
+      } catch (error) {
+        res.status(400).json({
+          message: error.message,
+        });
+      }
+    };
+
+    const serviceOrders = await Promise.all(
       services.map((service) => getOrders(service))
     );
 
-    // const order = await Order.aggregate([
-    //   {
-    //     $match: {
-    //       startDate: {
-    //         $gte: startOfDate,
-    //         $lte: endOfDate,
-    //       },
-    //       status: {
-    //         $ne: '632bc765dc2a7f68a3f383eb'
-    //       }
-    //     },
-    //   },
-    //   {
-    //     $lookup: {
-    //       from: 'services',
-    //       foreignField: '_id',
-    //       localField: 'serviceId',
-    //       as: 'service',
-    //     },
-    //   },
-    //   {
-    //     $match: {
-    //       'service.categoryId': new mongoose.Types.ObjectId(service.categoryId),
-    //     },
-    //   },
-    //   {
-    //     $project: {
-    //       service: 0,
-    //     },
-    //   },
-    // ]);
+    const serviceStaffs = await Promise.all(
+      services.map((service) => getServiceStaff(service))
+    );
 
     const listStaffOfService = [];
 
-    orderOfStore.forEach((order) => {
+    serviceOrders.forEach((orders, index) => {
       const listStaff = [];
-      if (order.length === 0) listStaffOfService.push(0);
+      const serviceDuration = roundedNumber(
+        (services[index].duration + 15) / 60
+      );
+      const timeSlotStart = +timeStart;
+      const timeSlotEnd = roundedNumber(+timeStart + serviceDuration);
+      orders.forEach((order) => {
+        order.servicesRegistered.forEach((service) => {
+          const orderStartTime = roundedNumber(
+            dateToHourNumber(service.timeStart)
+          );
+          const orderEndTime = roundedNumber(dateToHourNumber(service.timeEnd));
 
-      for (let i = 0; i < order.length; i++) {
-        const duration = roundedNumber(
-          (order[i].service[0].duration + 15) / 60
-        );
-        const startTime = +timeSlot;
-        const endTime = +timeSlot + duration;
-
-        const orderStartTime = roundedNumber(
-          dateToHourNumber(order[i].startDate)
-        );
-        const orderEndTime = roundedNumber(dateToHourNumber(order[i].endDate));
-
-        console.log({
-          duration,
-          startTime,
-          endTime,
-          orderStartTime,
-          orderEndTime,
+          if (
+            (orderEndTime >= timeSlotStart &&
+              roundedNumber(orderEndTime - timeSlotStart) <= serviceDuration) ||
+            (orderStartTime <= timeSlotEnd &&
+              roundedNumber(timeSlotEnd - orderStartTime) <= serviceOrders)
+          ) {
+            listStaff.push(service.staff);
+          }
         });
+      });
 
-        if (
-          (orderEndTime >= startTime &&
-            roundedNumber(orderEndTime - startTime) <= duration) ||
-          (orderStartTime <= endTime &&
-            roundedNumber(endTime - orderStartTime) <= duration)
-        ) {
-          if (listStaff.includes(order[i].staff)) return;
-          listStaff.push(order[i].staff);
-        }
-      }
-
-      listStaffOfService.push(listStaff.length);
+      listStaffOfService.push(listStaff);
     });
+
+    const filteredServices = services.map((service, index) => ({
+      ...service,
+      isDisable: listStaffOfService[index].length === serviceStaffs[index],
+    }));
 
     // lấy tổng số nv ra check
 
-    res.json({ orderOfStore, listStaffOfService });
+    res.json(filteredServices);
   } catch (error) {
     res.status(400).json({
       message: error.message,

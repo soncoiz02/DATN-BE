@@ -5,119 +5,138 @@ import Order from '../models/order';
 import Service from '../models/service';
 import Staff from '../models/staff';
 import User from '../models/user';
+import Voucher from '../models/voucher';
 import { dateToHourNumber } from '../utils/dateToHourNumber';
 import roundedNumber from '../utils/roundedNumber';
 
 // eslint-disable-next-line import/prefer-default-export
 export const create = async (req, res) => {
   try {
-    const { startDate, serviceId } = req.body;
+    const { startDate, servicesRegistered } = req.body;
     const startOfDate = startOfDay(new Date(startDate));
     const endOfDate = endOfDay(new Date(startDate));
-    const service = await Service.findOne({ _id: serviceId }).exec();
-    const timeSlot = dateToHourNumber(startDate);
 
-    const staffs = await User.aggregate([
-      {
-        $lookup: {
-          from: 'staffs',
-          foreignField: 'staff',
-          localField: '_id',
-          as: 'staff',
-        },
-      },
-      {
-        $match: {
-          'staff.category': new mongoose.Types.ObjectId(service.categoryId),
-        },
-      },
-      {
-        $project: {
-          staff: 0,
-        },
-      },
-    ]);
+    const handleGetFreeStaff = async (servicesRegister) => {
+      const service = await Service.findOne({
+        _id: servicesRegister.service,
+      }).exec();
 
-    const order = await Order.aggregate([
-      {
-        $match: {
-          startDate: {
-            $gte: startOfDate,
-            $lte: endOfDate,
-          },
-          status: {
-            $ne: new mongoose.Types.ObjectId('632bc765dc2a7f68a3f383eb'),
+      const staffs = await User.aggregate([
+        {
+          $lookup: {
+            from: 'staffs',
+            foreignField: 'staff',
+            localField: '_id',
+            as: 'staff',
           },
         },
-      },
-      {
-        $lookup: {
-          from: 'services',
-          foreignField: '_id',
-          localField: 'serviceId',
-          as: 'service',
+        {
+          $match: {
+            'staff.category': new mongoose.Types.ObjectId(service.categoryId),
+          },
         },
-      },
-      {
-        $match: {
-          'service.categoryId': new mongoose.Types.ObjectId(service.categoryId),
+        {
+          $project: {
+            staff: 0,
+          },
         },
-      },
-      {
-        $project: {
-          service: 0,
+      ]);
+
+      const orders = await Order.aggregate([
+        {
+          $match: {
+            startDate: {
+              $gte: startOfDate,
+              $lte: endOfDate,
+            },
+            status: {
+              $ne: new mongoose.Types.ObjectId('632bc765dc2a7f68a3f383eb'),
+            },
+          },
         },
-      },
-    ]);
+        {
+          $lookup: {
+            from: 'services',
+            foreignField: '_id',
+            localField: 'servicesRegistered.service',
+            as: 'service',
+          },
+        },
+        {
+          $match: {
+            'service.categoryId': new mongoose.Types.ObjectId(
+              service.categoryId
+            ),
+          },
+        },
+        {
+          $project: {
+            service: 0,
+          },
+        },
+      ]);
 
-    const listStaff = [];
+      const listStaff = [];
 
-    const duration = +roundedNumber((service.duration + 15) / 60);
-    const startTime = +timeSlot;
-    const endTime = +timeSlot + duration;
-
-    for (let i = 0; i < order.length; i++) {
-      const orderStartTime = roundedNumber(
-        dateToHourNumber(order[i].startDate)
+      const duration = roundedNumber(service.duration + 15 / 60);
+      const startTime = roundedNumber(
+        dateToHourNumber(servicesRegister.timeStart)
       );
-      const orderEndTime = roundedNumber(dateToHourNumber(order[i].endDate));
+      const endTime = roundedNumber(dateToHourNumber(servicesRegister.timeEnd));
 
-      console.log({
-        startTime,
-        orderStartTime,
-        endTime,
-        orderEndTime,
-        duration,
+      orders.forEach((order) => {
+        order.servicesRegistered.forEach((item) => {
+          const orderStartTime = roundedNumber(
+            dateToHourNumber(item.timeStart)
+          );
+          const orderEndTime = roundedNumber(dateToHourNumber(item.timeEnd));
+          if (
+            (orderEndTime >= startTime &&
+              roundedNumber(orderEndTime - startTime) <= duration) ||
+            (orderStartTime <= endTime &&
+              roundedNumber(endTime - orderStartTime) <= duration)
+          ) {
+            if (listStaff.includes(item.staff.toString())) return;
+            listStaff.push(item.staff.toString());
+          }
+        });
       });
-      if (
-        (orderEndTime >= startTime &&
-          roundedNumber(orderEndTime - startTime) <= duration) ||
-        (orderStartTime <= endTime &&
-          roundedNumber(endTime - orderStartTime) <= duration)
-      ) {
-        if (listStaff.includes(order[i].staff.toString())) return;
-        listStaff.push(order[i].staff.toString());
-        console.log('good');
-      }
-    }
 
-    const freeStaff = staffs.filter(
-      (item) => !listStaff.includes(item._id.toString())
-    );
+      const freeStaff = staffs.filter(
+        (item) => !listStaff.includes(item._id.toString())
+      );
 
-    const randomStaff = freeStaff[Math.floor(Math.random() * freeStaff.length)];
+      const randomStaff =
+        freeStaff[Math.floor(Math.random() * freeStaff.length)];
 
-    const orderData = {
-      ...req.body,
-      staff: randomStaff,
+      const servicesRegisterData = {
+        ...servicesRegister,
+        staff: randomStaff._id,
+      };
+
+      // eslint-disable-next-line consistent-return
+      return servicesRegisterData;
     };
 
-    const newOrder = await new Order(orderData).save();
+    const data = await Promise.all(
+      servicesRegistered.map((service) => handleGetFreeStaff(service))
+    );
+
+    const newOrder = await new Order({
+      ...req.body,
+      servicesRegistered: data,
+    }).save();
+
+    if (newOrder.voucher) {
+      await Voucher.findOneAndUpdate(
+        { _id: newOrder.voucher },
+        { isUsed: true }
+      ).exec();
+    }
 
     // eslint-disable-next-line no-underscore-dangle
     const detailOrder = await Order.findById(newOrder._id)
       .populate('status')
-      .populate('serviceId', 'name desc price image duration status')
       .populate('userId')
       .exec();
 
@@ -181,7 +200,7 @@ export const read = async (req, res) => {
     const order = await Order.findOne({ _id: req.params.id })
       .populate('status')
       .populate({
-        path: 'serviceId',
+        path: 'servicesRegistered.service',
         model: 'Service',
         populate: {
           path: 'categoryId',
@@ -192,8 +211,12 @@ export const read = async (req, res) => {
           },
         },
       })
-      .populate('staff')
+      .populate({
+        path: 'servicesRegistered.staff',
+        model: 'User',
+      })
       .populate('userId')
+      .populate('voucher')
       .exec();
     const activities = await ActivityLog.find({ orderId: req.params.id })
       .populate('userId')
@@ -210,12 +233,6 @@ export const read = async (req, res) => {
 };
 
 export const filterByStatus = async (req, res) => {
-  // let filter = {}
-  // if (req.query.status) {
-  //     // eslint-disable-next-line no-unused-vars
-  //     filter = { status: req.query.status.split(',') }
-  // }
-
   try {
     const order = await Order.find({ status: req.query.status.split(',') })
       .populate('status')
@@ -301,20 +318,52 @@ export const getFutureOrderByStore = async (req, res) => {
   try {
     const storeId = req.params.id;
     const today = startOfToday();
-    const order = await Order.aggregate([
+
+    const services = await Service.find().exec();
+    const staffs = await User.aggregate([
       {
         $lookup: {
-          from: 'services',
-          foreignField: '_id',
-          localField: 'serviceId',
-          as: 'services',
+          from: 'staffs',
+          foreignField: 'staff',
+          localField: '_id',
+          as: 'staff',
         },
       },
       {
         $lookup: {
           from: 'categories',
           foreignField: '_id',
-          localField: 'services.categoryId',
+          localField: 'staff.category',
+          as: 'category',
+        },
+      },
+      {
+        $match: {
+          'category.storeId': new mongoose.Types.ObjectId(storeId),
+        },
+      },
+      {
+        $project: {
+          staff: 0,
+          category: 0,
+        },
+      },
+    ]);
+
+    const orders = await Order.aggregate([
+      {
+        $lookup: {
+          from: 'services',
+          foreignField: '_id',
+          localField: 'servicesRegistered.service',
+          as: 'service',
+        },
+      },
+      {
+        $lookup: {
+          from: 'categories',
+          foreignField: '_id',
+          localField: 'service.categoryId',
           as: 'categories',
         },
       },
@@ -344,32 +393,26 @@ export const getFutureOrderByStore = async (req, res) => {
         },
       },
       {
-        $lookup: {
-          from: 'services',
-          foreignField: '_id',
-          localField: 'serviceId',
-          as: 'service',
-        },
-      },
-      {
         $project: {
           stores: 0,
           categories: 0,
-          services: 0,
+          service: 0,
         },
       },
     ]);
-    // const order = Order.find({
-    //   startDate: {
-    //     $gte: today,
-    //   },
-    //   status: { $ne: '632bc765dc2a7f68a3f383eb' },
-    // }).exec();
-    const formatedOrder = order.map((item) => ({
-      ...item,
-      status: item.status[0],
-      service: item.service[0],
-    }));
+
+    const formatedOrder = orders.map((item) => {
+      const orderServices = item.servicesRegistered.map((sv, index) => ({
+        ...sv,
+        service: services.find((service) => sv.service.equals(service._id)),
+        staff: staffs.find((staff) => sv.staff.equals(staff._id)),
+      }));
+      return {
+        ...item,
+        status: item.status[0],
+        servicesRegistered: orderServices,
+      };
+    });
     res.json(formatedOrder);
   } catch (error) {
     res.status(400).json({
@@ -397,7 +440,7 @@ export const getOrderByStaffCategory = async (req, res) => {
     const serviceDuration = roundedNumber((service.duration + 15) / 60);
     const serviceTimeSlot = service.timeSlot;
 
-    const order = await Order.aggregate([
+    const orders = await Order.aggregate([
       {
         $match: {
           startDate: {
@@ -413,7 +456,7 @@ export const getOrderByStaffCategory = async (req, res) => {
         $lookup: {
           from: 'staffs',
           foreignField: 'staff',
-          localField: 'staff',
+          localField: 'servicesRegistered.staff',
           as: 'staff',
         },
       },
@@ -429,34 +472,36 @@ export const getOrderByStaffCategory = async (req, res) => {
       },
     ]);
 
-    for (let i = 0; i < serviceTimeSlot.length; i++) {
+    serviceTimeSlot.forEach((item) => {
       let count = 0;
-      for (let j = 0; j < order.length; j++) {
-        const orderStartDate = new Date(order[j].startDate);
-        const orderEndDate = new Date(order[j].endDate);
-
-        const orderStartTime = roundedNumber(dateToHourNumber(orderStartDate));
-        const orderEndTime = roundedNumber(dateToHourNumber(orderEndDate));
-
-        if (
-          (serviceTimeSlot[i] <= orderEndTime &&
-            roundedNumber(orderEndTime - serviceTimeSlot) <= serviceDuration) ||
-          (serviceTimeSlot[i] + serviceDuration >= orderStartTime &&
-            roundedNumber(
-              serviceTimeSlot[i] + serviceDuration - orderStartTime
-            ) <= serviceDuration)
-        ) {
-          count++;
-        }
-      }
+      orders.forEach((order) => {
+        order.servicesRegistered.forEach((serviceItem) => {
+          const orderStartTime = roundedNumber(
+            dateToHourNumber(serviceItem.timeStart)
+          );
+          const orderEndTime = roundedNumber(
+            dateToHourNumber(serviceItem.timeEnd)
+          );
+          if (
+            (item <= orderEndTime &&
+              roundedNumber(orderEndTime - serviceTimeSlot) <=
+                serviceDuration) ||
+            (item + serviceDuration >= orderStartTime &&
+              roundedNumber(item + serviceDuration - orderStartTime) <=
+                serviceDuration)
+          ) {
+            count++;
+          }
+        });
+      });
       countTimeSlot.push(count);
-    }
+    });
 
     const checkDisableTimeSlot = countTimeSlot.map(
       (item) => item === totalStaff
     );
 
-    res.json(totalStaff);
+    res.json(checkDisableTimeSlot);
   } catch (error) {
     res.status(400).json({
       message: error.message,

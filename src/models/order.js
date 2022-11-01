@@ -26,18 +26,34 @@ const serviceSchema = new Schema(
     status: {
       type: ObjectId,
       ref: 'OrderStatus',
+      default: '632bc736dc2a7f68a3f383e7',
     },
-    serviceId: {
-      type: ObjectId,
-      ref: 'Service',
-    },
+    servicesRegistered: [
+      {
+        service: {
+          type: ObjectId,
+          ref: 'Service',
+        },
+        staff: {
+          type: ObjectId,
+          ref: 'Staff',
+          default: null,
+        },
+        timeStart: {
+          type: Date,
+        },
+        timeEnd: {
+          type: Date,
+        },
+      },
+    ],
     userId: {
       type: ObjectId,
       ref: 'User',
     },
-    staff: {
+    voucher: {
       type: ObjectId,
-      ref: 'User',
+      ref: 'Voucher',
       default: null,
     },
   },

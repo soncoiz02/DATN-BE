@@ -1,5 +1,13 @@
 import { Router } from 'express';
-import { create, list, read, remove, update } from '../controllers/voucher';
+import {
+  create,
+  getUserVoucher,
+  list,
+  read,
+  remove,
+  update,
+} from '../controllers/voucher';
+import { verifyToken } from '../middlewares/token';
 
 const router = Router();
 
@@ -8,5 +16,6 @@ router.get('/voucher', list);
 router.get('/voucher/:id', read);
 router.delete('/voucher/:id', remove);
 router.put('/voucher/:id', update);
+router.get('/getUserVoucher', verifyToken, getUserVoucher);
 
 export default router;
