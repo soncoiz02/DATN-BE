@@ -1,3 +1,4 @@
+import { decode } from 'jsonwebtoken';
 import Voucher from '../models/voucher';
 
 export const create = async (req, res) => {
@@ -51,6 +52,21 @@ export const update = async (req, res) => {
   const update = req.body;
   try {
     const voucher = await Voucher.findOneAndUpdate(condition, update).exec();
+    res.json(voucher);
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+    });
+  }
+};
+
+export const getUserVoucher = async (req, res) => {
+  try {
+    const userId = decode(req.token)._id;
+    const { storeId } = req.query;
+    const voucher = await Voucher.find({ userId, storeId, isUsed: false })
+      .populate('storeId')
+      .exec();
     res.json(voucher);
   } catch (error) {
     res.status(400).json({
