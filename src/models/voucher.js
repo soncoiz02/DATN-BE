@@ -4,14 +4,15 @@ const { ObjectId } = mongoose.Types;
 
 const voucherSchema = new Schema(
   {
-    discount: {
-      type: Number,
-      required: true,
-    },
     title: {
       type: String,
       required: true,
     },
+    discount: {
+      type: Number,
+      required: true,
+    },
+
     description: {
       type: String,
       required: true,
@@ -43,5 +44,7 @@ const voucherSchema = new Schema(
   },
   { timestamps: true }
 );
+
+voucherSchema.index({ '$**': 'text' });
 
 export default mongoose.model('Voucher', voucherSchema);

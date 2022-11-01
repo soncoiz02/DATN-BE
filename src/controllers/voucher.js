@@ -58,3 +58,12 @@ export const update = async (req, res) => {
     });
   }
 };
+
+export const search = async (req, res) => {
+  const searchString = req.query.q ? req.query.q : '';
+
+  const result = await Voucher.find({
+    $text: { $search: searchString },
+  }).exec();
+  res.json(result);
+};
