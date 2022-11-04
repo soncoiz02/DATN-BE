@@ -153,7 +153,6 @@ export const stRevenue = async (request, response) => {
       _totalByService.push(_item);
     }
     response.json({
-      storeId: request.params.id,
       revenue: _totalRevenue,
       orders: _totalOrders,
       services: _totalByService,
