@@ -44,19 +44,19 @@ export const create = async (req, res) => {
   try {
     const { billData, activityLog, emailOption } = req.body;
     // const bill = await new Bill(billData).save();
-    // await Order.findOneAndUpdate(
-    //   { _id: billData.order },
-    //   { status: '634e59b757b7ea792917962c' }
-    // ).exec();
-    // await new ActivityLog(activityLog).save();
-    transporter.sendMail(emailOption, (error, info) => {
-      if (error) {
-        console.log(error);
-      } else {
-        console.log(`Email sent: ${info.response}`);
-      }
-    });
-    // res.json(bill);
+    const newOrder = await Order.findOneAndUpdate(
+      { _id: billData.order },
+      { status: '634e59b757b7ea792917962c' }
+    ).exec();
+    await new ActivityLog(activityLog).save();
+    // transporter.sendMail(emailOption, (error, info) => {
+    //   if (error) {
+    //     console.log(error);
+    //   } else {
+    //     console.log(`Email sent: ${info.response}`);
+    //   }
+    // });
+    res.json(newOrder);
   } catch (error) {
     res.status(400).json({
       message: error.message,
