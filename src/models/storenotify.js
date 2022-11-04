@@ -9,7 +9,7 @@ const storeNotifySchema = new Schema(
     status: {
       type: Number,
       required: true,
-      default: false,
+      default: 0,
     },
     userId: {
       type: ObjectId,

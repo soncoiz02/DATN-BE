@@ -9,6 +9,9 @@ import mongoose from 'mongoose';
 
 import { Server } from 'socket.io';
 
+import cron from 'node-cron';
+
+import format from 'date-fns/format';
 import serviceRatingRouter from './routes/serviceRating';
 import storeRouter from './routes/store';
 import categoryRouter from './routes/category';
@@ -29,6 +32,7 @@ import StaffRoute from './routes/staff';
 import ActivityLog from './routes/activityLog';
 import BillRoute from './routes/bill';
 import VoucherRoute from './routes/voucher';
+import { createNotify, updateNotifyStatus } from './socket/controller';
 
 const app = express();
 const swaggerJSDocs = YAML.load('./api.yaml');
@@ -67,11 +71,22 @@ app.use('/api', ActivityLog);
 app.use('/api', BillRoute);
 app.use('/api', VoucherRoute);
 
-io.of('/order').on('connection', (socket) => {
-  console.log('socket connected');
-  socket.on('send-notify', (data) => {
-    io.of('/order').emit('receive-new-order', data.storeId);
-    io.of('/order').emit('receive-notify', data);
+let clientId = '';
+
+io.on('connection', (socket) => {
+  console.log(`Socket connected: ${socket.id}`);
+  socket.on('set-client-id', (data) => {
+    clientId = data;
+  });
+  socket.on('send-notify', async (data) => {
+    const newNotify = await createNotify(data.notifyData);
+    io.emit('receive-new-order', data.storeId);
+    io.emit('receive-notify', newNotify);
+    io.emit('receive-new-notify');
+  });
+  socket.on('update-notify-status', async (data) => {
+    await updateNotifyStatus(data);
+    socket.emit('receive-new-notify');
   });
 });
 

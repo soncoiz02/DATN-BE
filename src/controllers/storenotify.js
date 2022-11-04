@@ -12,7 +12,10 @@ export const create = async (request, response) => {
 };
 export const list = async (request, response) => {
   try {
-    const storeNotify = await StoreNotify.find({}).exec();
+    const { storeId } = request.query;
+    const storeNotify = await StoreNotify.find({ storeId })
+      .sort([['createdAt', -1]])
+      .exec();
     response.json(storeNotify);
   } catch (error) {
     response.status(400).json({ message: error.message });
