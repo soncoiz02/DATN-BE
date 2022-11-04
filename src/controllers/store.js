@@ -3,6 +3,8 @@ import Category from '../models/category';
 import storeRating from '../models/storeRating';
 import Order from '../models/order';
 import Service from '../models/service';
+import Voucher from '../models/voucher';
+
 // eslint-disable-next-line import/prefer-default-export
 export const createStore = async (request, response) => {
   try {
@@ -94,51 +96,66 @@ export const updateStore = async (request, response) => {
   }
 };
 
-export const storeRevenue = async (request, response) => {
+export const stRevenue = async (request, response) => {
   try {
     // console.log("storeId: " + request.params.id);
     const category = await Category.find({ storeId: request.params.id }).exec();
-    // console.log("categoryId: " + category[0]._id);
-    const service = await Service.find({ categoryId: category[0]._id }).exec();
+    // console.log("category: " + category);
+
     let serviceIds = [];
-    for (let i = 0; i < service.length; i++) {
-      serviceIds.push(service[i]['_id']);
+    for (let i = 0; i < category.length; i++) {
+      if (category[i].name === 'Danh mục không xác định') {
+        continue;
+      }
+      const service = await Service.find({
+        categoryId: category[i]._id,
+      }).exec();
+      for (let i = 0; i < service.length; i++) {
+        serviceIds.push(service[i]['_id']);
+      }
     }
     // console.log("serviceIds: " + serviceIds);
 
     const _order = await Order.find({})
       .populate('status', 'type')
-      .populate('serviceId', 'price');
+      .populate('servicesRegistered', 'service');
 
-    const order = _order.filter(
-      (order) =>
-        serviceIds.some((_serviceId) =>
-          _serviceId.equals(order.serviceId._id)
-        ) && order.status.type === 'done'
-    );
+    const order = _order.filter((order) => order.status.type === 'paid');
 
-    let _total = 0;
-    let _shouldCount = true;
+    let _totalRevenue = 0;
+    let _totalOrders = 0;
     let _totalByService = [];
     for (let i = 0; i < serviceIds.length; i++) {
+      const _service = await Service.findOne({ _id: serviceIds[i] }).exec();
       let _item = {};
       _item.serviceId = serviceIds[i];
+      _item.name = _service.name;
       _item.serviceRevenue = 0;
+      _item.serviceOrder = 0;
       for (let j = 0; j < order.length; j++) {
-        if (serviceIds[i].equals(order[j].serviceId._id)) {
-          _item.serviceRevenue += order[j].serviceId.price;
-        }
-
-        if (_shouldCount === true) {
-          _total += order[j].serviceId.price;
+        for (let k = 0; k < order[j].servicesRegistered.length; k++) {
+          let discount = 0;
+          if (serviceIds[i].equals(order[j].servicesRegistered[k].service)) {
+            if (order[j].voucher !== null) {
+              const _voucher = await Voucher.findOne({
+                _id: order[j].voucher,
+              }).exec();
+              discount = _voucher.discount / 100;
+            }
+            let actual_price = _service.price - _service.price * discount;
+            _item.serviceRevenue += actual_price;
+            _item.serviceOrder += 1;
+            _totalRevenue += actual_price;
+            _totalOrders += 1;
+          }
         }
       }
-      _shouldCount = false;
       _totalByService.push(_item);
     }
     response.json({
       storeId: request.params.id,
-      revenue: _total,
+      revenue: _totalRevenue,
+      orders: _totalOrders,
       services: _totalByService,
     });
   } catch (error) {
