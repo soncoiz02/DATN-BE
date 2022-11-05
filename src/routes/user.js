@@ -1,7 +1,9 @@
 import { Router } from 'express';
 import {
+  changePassword,
   GetoneUser,
   getStoreStaff,
+  getVerifyCode,
   listUser,
   removeUser,
   updateUser,
@@ -16,5 +18,9 @@ router.put('/user', verifyToken, updateUser);
 
 router.delete('/user/:id', removeUser);
 router.get('/store-staff/:id', getStoreStaff);
+
+router.put('/change-password', verifyToken, changePassword);
+
+router.post('/get-verify-code', getVerifyCode);
 
 export default router;
