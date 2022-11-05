@@ -1,21 +1,7 @@
-import nodemailer from 'nodemailer';
+import ActivityLog from '../models/activityLog';
 import Bill from '../models/bill';
 import Order from '../models/order';
-import ActivityLog from '../models/activityLog';
-
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    type: 'OAuth2',
-    user: 'beautyparadise1102@gmail.com',
-    pass: 'soncoiz02',
-    clientId:
-      '703579968493-uticdlqnqmbm6p2q8lg4r4f86987qlec.apps.googleusercontent.com',
-    clientSecret: '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',
-    refreshToken:
-      '1//046in42HmOhR1CgYIARAAGAQSNwF-L9Ir5birfMVNKhnODN2AEJB6sN7sy6HgysnSG9UsBm5XMSJWa-8FvEDUIdG_8XtFEKgqz0Q',
-  },
-});
+import sendEmail from '../utils/sendEmail';
 
 // eslint-disable-next-line import/prefer-default-export
 export const getAll = async (req, res) => {
@@ -49,13 +35,7 @@ export const create = async (req, res) => {
       { status: '634e59b757b7ea792917962c' }
     ).exec();
     await new ActivityLog(activityLog).save();
-    // transporter.sendMail(emailOption, (error, info) => {
-    //   if (error) {
-    //     console.log(error);
-    //   } else {
-    //     console.log(`Email sent: ${info.response}`);
-    //   }
-    // });
+    sendEmail(emailOption);
     res.json(newOrder);
   } catch (error) {
     res.status(400).json({
