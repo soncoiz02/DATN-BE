@@ -140,7 +140,8 @@ export const stRevenue = async (request, response) => {
               const _voucher = await Voucher.findOne({
                 _id: order[j].voucher,
               }).exec();
-              discount = _voucher.discount / 100;
+              discount =
+                _voucher.discount / 100 / order[j].servicesRegistered.length;
             }
             let actual_price = _service.price - _service.price * discount;
             _item.serviceRevenue += actual_price;
@@ -150,7 +151,9 @@ export const stRevenue = async (request, response) => {
           }
         }
       }
-      _totalByService.push(_item);
+      if (_item.serviceOrder > 0) {
+        _totalByService.push(_item);
+      }
     }
     response.json({
       revenue: _totalRevenue,
