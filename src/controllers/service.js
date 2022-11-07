@@ -7,6 +7,13 @@ import Store from '../models/store';
 // eslint-disable-next-line import/prefer-default-export
 export const create = async (req, res) => {
   try {
+    // console.log(req.body.name);
+    const _service = await Service.findOne({ name: req.body.name }).exec();
+    if (_service !== null) {
+      return res.status(400).json({
+        message: 'Service name existed !!!',
+      });
+    }
     const service = await new Service(req.body).save();
     res.json(service);
   } catch (error) {
