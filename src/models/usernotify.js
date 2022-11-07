@@ -9,6 +9,7 @@ const userNotifySchema = new Schema(
     status: {
       type: Number,
       required: true,
+      default: 0,
     },
     userId: {
       type: ObjectId,

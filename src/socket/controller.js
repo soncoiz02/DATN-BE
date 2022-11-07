@@ -1,4 +1,5 @@
 import Storenotify from '../models/storenotify';
+import Usernotify from '../models/usernotify';
 
 export const updateNotifyStatus = async (id) => {
   try {
@@ -12,10 +13,23 @@ export const updateNotifyStatus = async (id) => {
   }
 };
 
+const createStaffNotify = async (notify) => {
+  try {
+    const newNotify = await Usernotify(notify).save();
+    return newNotify;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 export const createNotify = async (data) => {
   try {
-    const newNotify = await Storenotify(data).save();
-    return newNotify;
+    const { storeNotifyData, staffNotifyData } = data;
+    const newStoreNotify = await Storenotify(storeNotifyData).save();
+    const newStaffNotify = await Promise.all(
+      staffNotifyData.map((item) => createStaffNotify(item))
+    );
+    return { newStoreNotify, newStaffNotify };
   } catch (error) {
     console.log(error);
   }
