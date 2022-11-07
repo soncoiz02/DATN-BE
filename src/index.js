@@ -88,6 +88,9 @@ io.on('connection', (socket) => {
     await updateNotifyStatus(data);
     socket.emit('receive-new-notify');
   });
+  socket.on('change-status', () => {
+    io.emit('receive-status-change');
+  });
 });
 
 mongoose
