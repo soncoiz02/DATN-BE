@@ -1,4 +1,6 @@
+import { decode } from 'jsonwebtoken';
 import UserNotify from '../models/usernotify';
+import { sort } from './service';
 
 // eslint-disable-next-line import/prefer-default-export
 export const create = async (request, response) => {
@@ -51,5 +53,19 @@ export const update = async (request, response) => {
     response.json(userNotify);
   } catch (error) {
     response.status(400).json({ message: error.message });
+  }
+};
+
+export const staffNotify = async (req, res) => {
+  try {
+    const staffId = decode(req.token)._id;
+    const notify = await UserNotify.find({ userId: staffId })
+      .sort([['createdAt', -1]])
+      .exec();
+    res.json(notify);
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+    });
   }
 };

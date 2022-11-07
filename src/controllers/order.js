@@ -78,7 +78,7 @@ export const create = async (req, res) => {
 
       const listStaff = [];
 
-      const duration = roundedNumber(service.duration + 15 / 60);
+      const duration = roundedNumber((service.duration + 15) / 60);
       const startTime = roundedNumber(
         dateToHourNumber(servicesRegister.timeStart)
       );
