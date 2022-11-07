@@ -28,6 +28,13 @@ const serviceSchema = new Schema(
       type: Number,
       required: true,
     },
+    totalStaff: {
+      type: Number,
+      default: 0,
+    },
+    timeSlot: {
+      type: Array,
+    },
     categoryId: {
       type: ObjectId,
       ref: 'Category',

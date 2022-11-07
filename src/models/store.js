@@ -32,7 +32,7 @@ const storeSchema = new Schema(
     },
     rateId: {
       type: ObjectId,
-      ref: 'ServiceRating',
+      ref: 'StoreRating',
     },
   },
   { timestamps: true }
