@@ -1,4 +1,4 @@
-import { endOfDay, startOfDay, startOfToday } from 'date-fns';
+import { endOfDay, endOfToday, startOfDay, startOfToday } from 'date-fns';
 import mongoose from 'mongoose';
 import ActivityLog from '../models/activityLog';
 import Order from '../models/order';
@@ -158,10 +158,37 @@ export const create = async (req, res) => {
 
 export const list = async (req, res) => {
   try {
+    const { page, limit } = req.query;
+    const pageLimit = +limit || 10;
+    const pageNum = (+page - 1) * limit;
     const order = await Order.find({})
       .populate('status')
-      .populate('serviceId', 'name desc price image duration status');
-    res.json(order);
+      .populate({
+        path: 'servicesRegistered.service',
+        model: 'Service',
+        populate: {
+          path: 'categoryId',
+          model: 'Category',
+          populate: {
+            path: 'storeId',
+            model: 'Store',
+          },
+        },
+      })
+      .populate({
+        path: 'servicesRegistered.staff',
+        model: 'User',
+      })
+      .populate('userId')
+      .populate('voucher')
+      .limit(pageLimit)
+      .skip(pageNum)
+      .sort([['createdAt', -1]])
+      .exec();
+
+    const total = await Order.count().exec();
+
+    res.json({ total, order });
   } catch (error) {
     res.status(400).json({
       message: error.message,
@@ -402,7 +429,7 @@ export const getFutureOrderByStore = async (req, res) => {
     ]);
 
     const formatedOrder = orders.map((item) => {
-      const orderServices = item.servicesRegistered.map((sv, index) => ({
+      const orderServices = item.servicesRegistered.map((sv) => ({
         ...sv,
         service: services.find((service) => sv.service.equals(service._id)),
         staff: staffs.find((staff) => sv.staff.equals(staff._id)),
@@ -502,6 +529,71 @@ export const getOrderByStaffCategory = async (req, res) => {
     );
 
     res.json(checkDisableTimeSlot);
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+    });
+  }
+};
+
+export const getTodayOrder = async (req, res) => {
+  try {
+    const orders = await Order.find({
+      startDate: {
+        $gte: startOfToday().toISOString(),
+        $lte: endOfToday().toISOString(),
+      },
+    }).exec();
+    res.json(orders);
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+    });
+  }
+};
+
+export const searchOrder = async (req, res) => {
+  try {
+    const { search } = req.query;
+    if (!isNaN(+search)) {
+      const orders = await Order.find({
+        'infoUser.phone': { $regex: search, $options: 'i' },
+      }).exec();
+      return res.json(orders);
+    }
+    const orders = await Order.find({
+      'infoUser.name': { $regex: search, $options: 'i' },
+    }).exec();
+    res.json(orders);
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+    });
+  }
+};
+
+export const getByDate = async (req, res) => {
+  try {
+    const { date, limit, page } = req.query;
+    const pageLimit = +limit || 10;
+    const pageNum = (+page - 1) * pageLimit;
+
+    const orders = await Order.find({
+      startDate: {
+        $gte: startOfDay(new Date(date)).toISOString(),
+        $lte: endOfDay(new Date(date)).toISOString(),
+      },
+    })
+      .limit(pageLimit)
+      .skip(pageNum)
+      .exec();
+    const total = await Order.countDocuments({
+      startDate: {
+        $gte: startOfDay(new Date(date)).toISOString(),
+        $lte: endOfDay(new Date(date)).toISOString(),
+      },
+    }).exec();
+    res.json({ total, orders });
   } catch (error) {
     res.status(400).json({
       message: error.message,
