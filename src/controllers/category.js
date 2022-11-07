@@ -2,8 +2,19 @@ import Category from '../models/category';
 import Service from '../models/service';
 // eslint-disable-next-line import/order
 // eslint-disable-next-line import/prefer-default-export
+
 export const create = async (request, response) => {
   try {
+    // console.log(request.body.name)
+    const _category = await Category.findOne({
+      name: request.body.name,
+    }).exec();
+    if (_category !== null) {
+      return response.status(400).json({
+        message: 'Category name existed !!!',
+      });
+    }
+
     const category = await new Category(request.body).save();
     response.json(category);
   } catch (error) {
@@ -12,6 +23,7 @@ export const create = async (request, response) => {
     });
   }
 };
+
 export const list = async (request, response) => {
   try {
     const category = await Category.find();
