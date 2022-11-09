@@ -600,3 +600,75 @@ export const getByDate = async (req, res) => {
     });
   }
 };
+
+export const filterOrder = async (req, res) => {
+  try {
+    const {
+      staffId,
+      date,
+      status,
+      search,
+      page,
+      limit,
+      sortField,
+      sortOrder,
+      serviceId,
+    } = req.query;
+
+    const pageLimit = +limit || 10;
+    const pageNum = (+page - 1) * pageLimit;
+
+    const options = {
+      ...(serviceId && {
+        'servicesRegistered.service': serviceId,
+      }),
+      ...(staffId && { 'servicesRegistered.staff': staffId }),
+      ...(date && {
+        startDate: {
+          $gte: startOfDay(new Date(date)).toISOString(),
+          $lte: endOfDay(new Date(date)).toISOString(),
+        },
+      }),
+      ...(status && { status }),
+      ...(search && {
+        ...(!isNaN(+search) && {
+          'infoUser.phone': { $regex: search, $options: 'i' },
+        }),
+        ...(isNaN(+search) && {
+          'infoUser.name': { $regex: search, $options: 'i' },
+        }),
+      }),
+    };
+
+    const total = await Order.countDocuments(options).exec();
+    const orders = await Order.find(options)
+      .populate('status')
+      .populate({
+        path: 'servicesRegistered.service',
+        model: 'Service',
+        populate: {
+          path: 'categoryId',
+          model: 'Category',
+          populate: {
+            path: 'storeId',
+            model: 'Store',
+          },
+        },
+      })
+      .populate({
+        path: 'servicesRegistered.staff',
+        model: 'User',
+      })
+      .populate('userId')
+      .populate('voucher')
+      .limit(pageLimit)
+      .skip(pageNum)
+      .sort([[sortField || 'createdAt', sortOrder || -1]])
+      .exec();
+    res.json({ total, orders });
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+    });
+  }
+};

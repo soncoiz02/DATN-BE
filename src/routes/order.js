@@ -2,6 +2,7 @@ import { Router } from 'express';
 import {
   create,
   filterByStatus,
+  filterOrder,
   getByDate,
   getFutureOrderByStore,
   getOrderByDate,
@@ -43,5 +44,7 @@ route.get('/search-order', searchOrder);
 route.get('/today-order', getTodayOrder);
 
 route.get('/get-by-date', getByDate);
+
+route.get('/filter-order', filterOrder);
 
 export default route;
