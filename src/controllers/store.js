@@ -123,7 +123,7 @@ export const stRevenue = async (request, response) => {
     const order = _order.filter((order) => order.status.type === 'paid');
 
     let _totalRevenue = 0;
-    let _totalOrders = 0;
+    let _totalOrders = [];
     let _totalByService = [];
     for (let i = 0; i < serviceIds.length; i++) {
       const _service = await Service.findOne({ _id: serviceIds[i] }).exec();
@@ -136,6 +136,9 @@ export const stRevenue = async (request, response) => {
         for (let k = 0; k < order[j].servicesRegistered.length; k++) {
           let discount = 0;
           if (serviceIds[i].equals(order[j].servicesRegistered[k].service)) {
+            if (_totalOrders.indexOf(order[j]._id) < 0) {
+              _totalOrders.push(order[j]._id);
+            }
             if (order[j].voucher !== null) {
               const _voucher = await Voucher.findOne({
                 _id: order[j].voucher,
@@ -147,7 +150,6 @@ export const stRevenue = async (request, response) => {
             _item.serviceRevenue += actual_price;
             _item.serviceOrder += 1;
             _totalRevenue += actual_price;
-            _totalOrders += 1;
           }
         }
       }
@@ -156,8 +158,9 @@ export const stRevenue = async (request, response) => {
       }
     }
     response.json({
+      storeId: request.params.id,
       revenue: _totalRevenue,
-      orders: _totalOrders,
+      orders: _totalOrders.length,
       services: _totalByService,
     });
   } catch (error) {
