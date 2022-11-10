@@ -26,7 +26,15 @@ export const create = async (request, response) => {
 
 export const list = async (request, response) => {
   try {
-    const category = await Category.find();
+    const { client } = request.query;
+    if (client) {
+      const category = await Category.find({
+        status: 1,
+        _id: { $ne: '63518497a3ca43d2916000cc' },
+      }).exec();
+      return response.json(category);
+    }
+    const category = await Category.find().exec();
     response.json(category);
   } catch (error) {
     response.status(400).json({

@@ -9,6 +9,7 @@ import {
   update,
   getServiceByStore,
   filterByCatePrice,
+  getServiceByCate,
 } from '../controllers/service';
 
 const route = Router();
@@ -35,5 +36,7 @@ route.post('/search-service', search);
 
 // find by storeId
 route.get('/service/findByStoreId/:id', getServiceByStore);
+
+route.get('/service-by-cate', getServiceByCate);
 
 export default route;
