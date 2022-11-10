@@ -167,3 +167,85 @@ export const stRevenue = async (request, response) => {
     response.status(400).json({ message: error.message });
   }
 };
+
+export const bestServices = async (request, response) => {
+  try {
+    // console.log("storeId: " + request.params.id);
+    const category = await Category.find({ storeId: request.params.id }).exec();
+    // console.log("category: " + category);
+
+    let serviceIds = [];
+    for (let i = 0; i < category.length; i++) {
+      if (category[i].name === 'Danh mục không xác định') {
+        continue;
+      }
+      const service = await Service.find({
+        categoryId: category[i]._id,
+      }).exec();
+      for (let i = 0; i < service.length; i++) {
+        serviceIds.push(service[i]['_id']);
+      }
+    }
+    // console.log("serviceIds: " + serviceIds);
+
+    const _order = await Order.find({})
+      .populate('status', 'type')
+      .populate('servicesRegistered', 'service');
+
+    const order = _order.filter((order) => order.status.type === 'paid');
+
+    let _totalRevenue = 0;
+    let _bestRevenueService = {};
+    let _mostUsedService = {};
+    let bestRevenue = 0;
+    let mostUsedCount = 0;
+    for (let i = 0; i < serviceIds.length; i++) {
+      const _service = await Service.findOne({ _id: serviceIds[i] }).exec();
+      let _item = {};
+      _item.serviceId = serviceIds[i];
+      _item.name = _service.name;
+      _item.serviceRevenue = 0;
+      _item.serviceOrder = 0;
+      for (let j = 0; j < order.length; j++) {
+        for (let k = 0; k < order[j].servicesRegistered.length; k++) {
+          let discount = 0;
+          if (serviceIds[i].equals(order[j].servicesRegistered[k].service)) {
+            if (order[j].voucher !== null) {
+              const _voucher = await Voucher.findOne({
+                _id: order[j].voucher,
+              }).exec();
+              discount =
+                _voucher.discount / 100 / order[j].servicesRegistered.length;
+            }
+            let actual_price = _service.price - _service.price * discount;
+            _item.serviceRevenue += actual_price;
+            _item.serviceOrder += 1;
+            _totalRevenue += actual_price;
+          }
+        }
+      }
+
+      if (_item.serviceRevenue > bestRevenue) {
+        bestRevenue = _item.serviceRevenue;
+        _bestRevenueService.id = _item.serviceId;
+        _bestRevenueService.name = _item.name;
+        _bestRevenueService.revenue = bestRevenue;
+      }
+
+      if (_item.serviceOrder > mostUsedCount) {
+        mostUsedCount = _item.serviceOrder;
+        _mostUsedService.id = _item.serviceId;
+        _mostUsedService.name = _item.name;
+        _mostUsedService.used = mostUsedCount;
+      }
+    }
+    response.json({
+      storeId: request.params.id,
+      revenue: _totalRevenue,
+      bestRevenueService: _bestRevenueService,
+      mostUsedService: _mostUsedService,
+    });
+  } catch (error) {
+    response.status(400).json({ message: error.message });
+  }
+};
