@@ -8,6 +8,7 @@ import {
 } from '../controllers/advancedStore';
 
 import {
+  bestServices,
   createStore,
   deleteStore,
   listStore,
@@ -29,4 +30,5 @@ router.get('/store/:id', storeDetail);
 router.delete('/store/:id', deleteStore);
 router.put('/store/:id', updateStore);
 router.get('/store-revenue/:id', stRevenue);
+router.get('/store/best-services/:id', bestServices);
 export default router;
