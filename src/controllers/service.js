@@ -18,29 +18,32 @@ export const create = async (req, res) => {
 
 export const list = async (req, res) => {
   try {
-    const service = await Service.find({}).exec();
-    const rated = await ServiceRating.find({}).exec();
-    const steps = await ServiceStep.find({}).exec();
-    const newService = service.map((item) => {
-      const serviceRated = rated.filter((rate) =>
-        rate.serviceId.equals(item._id)
-      );
-      const serviceStep = steps.filter((step) =>
-        step.serviceId.equals(item._id)
-      );
+    const services = await Service.aggregate([
+      {
+        $lookup: {
+          from: 'serviceratings',
+          foreignField: 'serviceId',
+          localField: '_id',
+          as: 'rated',
+        },
+      },
+    ]);
+
+    const serviceFormated = services.map((service) => {
+      const totalRated = service.rated.length;
+      const avgRated =
+        service.rated.reduce((a, b) => a + b.rate, 0) / totalRated;
+
       return {
-        ...item._doc,
-        steps: serviceStep,
+        ...service,
         rated: {
-          total: serviceRated.length,
-          avg: (
-            serviceRated.reduce((prev, rateItem) => prev + rateItem.rate, 0) /
-            serviceRated.length
-          ).toFixed(2),
+          total: totalRated,
+          avg: avgRated ? +avgRated.toFixed(1) : 0,
         },
       };
     });
-    res.json(newService);
+
+    res.json(serviceFormated);
   } catch (error) {
     res.status(400).json({
       message: error.message,
@@ -280,6 +283,47 @@ export const filterByCatePrice = async (req, res) => {
       }
     }
     res.json(newService);
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+    });
+  }
+};
+
+export const getServiceByCate = async (req, res) => {
+  try {
+    const { cateId } = req.query;
+    const services = await Service.aggregate([
+      {
+        $match: {
+          categoryId: new mongoose.Types.ObjectId(cateId),
+        },
+      },
+      {
+        $lookup: {
+          from: 'serviceratings',
+          foreignField: 'serviceId',
+          localField: '_id',
+          as: 'rated',
+        },
+      },
+    ]);
+
+    const serviceFormated = services.map((service) => {
+      const totalRated = service.rated.length;
+      const avgRated =
+        service.rated.reduce((a, b) => a + b.rate, 0) / totalRated;
+
+      return {
+        ...service,
+        rated: {
+          total: totalRated,
+          avg: avgRated ? +avgRated.toFixed(1) : 0,
+        },
+      };
+    });
+
+    res.json(serviceFormated);
   } catch (error) {
     res.status(400).json({
       message: error.message,
