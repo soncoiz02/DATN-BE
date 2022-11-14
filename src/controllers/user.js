@@ -268,8 +268,8 @@ export const listOrdered = async (req, response) => {
         userIds.push(order[i].userId.toHexString());
       }
     }
-    console.log(userIds);
-    let userList = [];
+    // console.log(userIds);
+    let _userList = [];
     for (let i = 0; i < userIds.length; i++) {
       const user = await User.findOne(
         { _id: userIds[i] },
@@ -279,9 +279,12 @@ export const listOrdered = async (req, response) => {
         .populate('roleId', 'name')
         .exec();
       if (user !== null) {
-        userList.push(user);
+        _userList.push(user);
       }
     }
+    const userList = _userList.filter(
+      (user) => user.roleId.name === 'Customer'
+    );
     response.json(userList);
   } catch (error) {
     return response.status(400).json({
