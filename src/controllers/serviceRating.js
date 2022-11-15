@@ -96,7 +96,7 @@ export const getAllServiceRated = async (req, res) => {
 
 export const getBestRatedServices = async (req, res) => {
   try {
-    let serviceRating = await ServiceRating.find({}).exec();
+    let serviceRating = await ServiceRating.find({}).populate('userId').exec();
     serviceRating = serviceRating.sort((a, b) => b.rate - a.rate);
     res.json(serviceRating.slice(0, 4));
   } catch (error) {
