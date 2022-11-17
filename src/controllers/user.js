@@ -3,6 +3,7 @@ import { decode } from 'jsonwebtoken';
 import mongoose from 'mongoose';
 import User from '../models/user';
 import sendEmail from '../utils/sendEmail';
+import Order from '../models/order';
 
 // eslint-disable-next-line import/prefer-default-export
 export const GetoneUser = async (request, response) => {
@@ -250,6 +251,43 @@ export const getVerifyCode = async (req, res) => {
     res.json(code);
   } catch (error) {
     res.status(400).json({
+      message: error.message,
+    });
+  }
+};
+
+export const listOrdered = async (req, response) => {
+  try {
+    const order = await Order.find({});
+    let userIds = [];
+    for (let i = 0; i < order.length; i++) {
+      if (
+        order[i].userId !== null &&
+        userIds.indexOf(order[i].userId.toHexString()) < 0
+      ) {
+        userIds.push(order[i].userId.toHexString());
+      }
+    }
+    // console.log(userIds);
+    let _userList = [];
+    for (let i = 0; i < userIds.length; i++) {
+      const user = await User.findOne(
+        { _id: userIds[i] },
+        'username name birthday phone email avt '
+      )
+        .sort({ createAt: -1 })
+        .populate('roleId', 'name')
+        .exec();
+      if (user !== null) {
+        _userList.push(user);
+      }
+    }
+    const userList = _userList.filter(
+      (user) => user.roleId.name === 'Customer'
+    );
+    response.json(userList);
+  } catch (error) {
+    return response.status(400).json({
       message: error.message,
     });
   }
