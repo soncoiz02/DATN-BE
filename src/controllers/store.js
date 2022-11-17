@@ -133,10 +133,7 @@ export const storeRevenue = async (request, response) => {
           }
         });
       });
-
-      if (_item.serviceOrder > 0) {
-        _totalByService.push(_item);
-      }
+      _totalByService.push(_item);
     });
     response.json({
       revenue: _totalRevenue,
