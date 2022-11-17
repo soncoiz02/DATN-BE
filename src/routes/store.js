@@ -12,7 +12,7 @@ import {
   deleteStore,
   listStore,
   storeDetail,
-  stRevenue,
+  storeRevenue,
   updateStore,
 } from '../controllers/store';
 
@@ -28,5 +28,5 @@ router.get('/filterByRated', filterByRate);
 router.get('/store/:id', storeDetail);
 router.delete('/store/:id', deleteStore);
 router.put('/store/:id', updateStore);
-router.get('/store-revenue/:id', stRevenue);
+router.get('/store-revenue', storeRevenue);
 export default router;
