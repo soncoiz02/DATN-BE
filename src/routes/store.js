@@ -14,6 +14,7 @@ import {
   listStore,
   storeDetail,
   storeRevenue,
+  top_Services,
   updateStore,
 } from '../controllers/store';
 
@@ -28,6 +29,7 @@ router.get('/sortByRated', sortByRated);
 router.get('/filterByRated', filterByRate);
 router.get('/store-revenue', storeRevenue);
 router.get('/store/bestServices', best_Services);
+router.get('/store/topServices', top_Services);
 router.get('/store/:id', storeDetail);
 router.delete('/store/:id', deleteStore);
 router.put('/store/:id', updateStore);

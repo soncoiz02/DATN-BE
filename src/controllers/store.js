@@ -98,10 +98,11 @@ export const updateStore = async (request, response) => {
 
 export const storeRevenue = async (request, response) => {
   try {
-    const orders = await Order.find({ status: '634e59b757b7ea792917962c' })
+    const _orders = await Order.find({})
       .populate('voucher')
+      .populate('status')
       .exec();
-
+    const orders = _orders.filter((order) => order.status.type === 'paid');
     const services = await Service.find().exec();
 
     let _totalRevenue = 0;
@@ -147,9 +148,11 @@ export const storeRevenue = async (request, response) => {
 
 export const best_Services = async (request, response) => {
   try {
-    const orders = await Order.find({ status: '634e59b757b7ea792917962c' })
+    const _orders = await Order.find({})
       .populate('voucher')
+      .populate('status')
       .exec();
+    const orders = _orders.filter((order) => order.status.type === 'paid');
     const services = await Service.find().exec();
 
     let _totalRevenue = 0;
@@ -204,5 +207,51 @@ export const best_Services = async (request, response) => {
     });
   } catch (error) {
     response.status(400).json({ message: error.message });
+  }
+};
+
+export const top_Services = async (request, response) => {
+  try {
+    const _orders = await Order.find({})
+      .populate('voucher')
+      .populate('status')
+      .exec();
+    const orders = _orders.filter((order) => order.status.type === 'paid');
+    const services = await Service.find().exec();
+
+    let _totalByService = [];
+    services.forEach((service) => {
+      let _item = {};
+      _item.serviceId = service._id;
+      _item.name = service.name;
+      _item.price = service.price;
+      _item.serviceRevenue = 0;
+      _item.serviceOrder = 0;
+      orders.forEach((order) => {
+        order.servicesRegistered.forEach((item) => {
+          if (item.service.toString() === service._id.toString()) {
+            let actual_price =
+              order.voucher === null
+                ? service.price
+                : service.price *
+                  (1 -
+                    order.voucher.discount /
+                      100 /
+                      order.servicesRegistered.length);
+            _item.serviceRevenue += actual_price;
+            _item.serviceOrder += 1;
+          }
+        });
+      });
+      _totalByService.push(_item);
+    });
+    const totalByService = _totalByService.sort(
+      (a, b) => b.serviceRevenue - a.serviceRevenue
+    );
+    response.json({
+      'Top 5 services': totalByService.slice(0, 5),
+    });
+  } catch (error) {
+    console.log(error);
   }
 };
