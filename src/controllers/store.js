@@ -249,7 +249,7 @@ export const top_Services = async (request, response) => {
       (a, b) => b.serviceRevenue - a.serviceRevenue
     );
     response.json({
-      'Top 5 services': totalByService.slice(0, 5),
+      dataService: totalByService.slice(0, 5),
     });
   } catch (error) {
     console.log(error);
