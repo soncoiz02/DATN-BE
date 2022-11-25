@@ -252,6 +252,6 @@ export const top_Services = async (request, response) => {
       dataService: totalByService.slice(0, 5),
     });
   } catch (error) {
-    console.log(error);
+    response.status(400).json({ message: error.message });
   }
 };
