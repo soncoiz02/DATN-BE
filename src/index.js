@@ -32,7 +32,11 @@ import StaffRoute from './routes/staff';
 import ActivityLog from './routes/activityLog';
 import BillRoute from './routes/bill';
 import VoucherRoute from './routes/voucher';
-import { createNotify, updateNotifyStatus } from './socket/controller';
+import {
+  createNotify,
+  createUserNotify,
+  updateNotifyStatus,
+} from './socket/controller';
 
 const app = express();
 const swaggerJSDocs = YAML.load('./api.yaml');
@@ -90,6 +94,11 @@ io.on('connection', (socket) => {
   });
   socket.on('change-status', () => {
     io.emit('receive-status-change');
+  });
+
+  socket.on('send-notify-to-user', async (data) => {
+    const newNotify = await createUserNotify(data);
+    io.emit('receive-user-notify', newNotify);
   });
 });
 

@@ -12,11 +12,20 @@ export const create = async (request, response) => {
 };
 export const list = async (request, response) => {
   try {
-    const { storeId } = request.query;
+    const { storeId, page } = request.query;
+    const limit = 10 * page;
     const storeNotify = await StoreNotify.find({ storeId })
+      .limit(limit)
       .sort([['createdAt', -1]])
       .exec();
-    response.json(storeNotify);
+
+    const total = await StoreNotify.count().exec();
+    const totalUnread = await StoreNotify.count({ status: 0 }).exec();
+    response.json({
+      total,
+      totalUnread,
+      data: storeNotify,
+    });
   } catch (error) {
     response.status(400).json({ message: error.message });
   }
