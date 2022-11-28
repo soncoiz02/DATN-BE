@@ -343,104 +343,44 @@ export const getOrderByUser = async (req, res) => {
 
 export const getFutureOrderByStore = async (req, res) => {
   try {
-    const storeId = req.params.id;
     const today = startOfToday();
+    const { staffId, status, search, serviceId } = req.query;
 
-    const services = await Service.find().exec();
-    const staffs = await User.aggregate([
-      {
-        $lookup: {
-          from: 'staffs',
-          foreignField: 'staff',
-          localField: '_id',
-          as: 'staff',
-        },
-      },
-      {
-        $lookup: {
-          from: 'categories',
-          foreignField: '_id',
-          localField: 'staff.category',
-          as: 'category',
-        },
-      },
-      {
-        $match: {
-          'category.storeId': new mongoose.Types.ObjectId(storeId),
-        },
-      },
-      {
-        $project: {
-          staff: 0,
-          category: 0,
-        },
-      },
-    ]);
+    const options = {
+      ...(serviceId && {
+        'servicesRegistered.service': serviceId,
+      }),
+      ...(staffId && { 'servicesRegistered.staff': staffId }),
+      ...(status && { status }),
+      ...(search && {
+        ...(!isNaN(+search) && {
+          'infoUser.phone': { $regex: search, $options: 'i' },
+        }),
+        ...(isNaN(+search) && {
+          'infoUser.name': { $regex: search, $options: 'i' },
+        }),
+      }),
+    };
 
-    const orders = await Order.aggregate([
-      {
-        $lookup: {
-          from: 'services',
-          foreignField: '_id',
-          localField: 'servicesRegistered.service',
-          as: 'service',
-        },
+    const orders = await Order.find({
+      startDate: {
+        $gte: today,
       },
-      {
-        $lookup: {
-          from: 'categories',
-          foreignField: '_id',
-          localField: 'service.categoryId',
-          as: 'categories',
-        },
-      },
-      {
-        $lookup: {
-          from: 'stores',
-          foreignField: '_id',
-          localField: 'categories.storeId',
-          as: 'stores',
-        },
-      },
-      {
-        $match: {
-          'stores._id': new mongoose.Types.ObjectId(storeId),
-          startDate: {
-            $gte: today,
-          },
-          status: { $ne: '632bc765dc2a7f68a3f383eb' },
-        },
-      },
-      {
-        $lookup: {
-          from: 'orderstatuses',
-          foreignField: '_id',
-          localField: 'status',
-          as: 'status',
-        },
-      },
-      {
-        $project: {
-          stores: 0,
-          categories: 0,
-          service: 0,
-        },
-      },
-    ]);
+      status: { $ne: '632bc765dc2a7f68a3f383eb' },
+      ...options,
+    })
+      .populate({
+        path: 'servicesRegistered.service',
+        model: 'Service',
+      })
+      .populate({
+        path: 'servicesRegistered.staff',
+        model: 'User',
+      })
+      .populate('status')
+      .exec();
 
-    const formatedOrder = orders.map((item) => {
-      const orderServices = item.servicesRegistered.map((sv) => ({
-        ...sv,
-        service: services.find((service) => sv.service.equals(service._id)),
-        staff: staffs.find((staff) => sv.staff.equals(staff._id)),
-      }));
-      return {
-        ...item,
-        status: item.status[0],
-        servicesRegistered: orderServices,
-      };
-    });
-    res.json(formatedOrder);
+    res.json(orders);
   } catch (error) {
     res.status(400).json({
       message: error.message,

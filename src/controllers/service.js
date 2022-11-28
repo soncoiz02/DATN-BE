@@ -27,6 +27,14 @@ export const list = async (req, res) => {
           as: 'rated',
         },
       },
+      {
+        $lookup: {
+          from: 'categories',
+          foreignField: '_id',
+          localField: 'categoryId',
+          as: 'category',
+        },
+      },
     ]);
 
     const serviceFormated = services.map((service) => {
@@ -324,6 +332,29 @@ export const getServiceByCate = async (req, res) => {
     });
 
     res.json(serviceFormated);
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+    });
+  }
+};
+
+export const getServicePerPage = async (req, res) => {
+  try {
+    const { page } = req.query;
+    const size = 10;
+    const pageSkip = (page - 1) * size;
+    const services = await Service.find({})
+      .populate('categoryId')
+      .skip(pageSkip)
+      .limit(size)
+      .exec();
+
+    const total = await Service.count().exec();
+    res.json({
+      data: services,
+      total,
+    });
   } catch (error) {
     res.status(400).json({
       message: error.message,
