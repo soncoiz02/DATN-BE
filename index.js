@@ -12,31 +12,31 @@ import { Server } from 'socket.io';
 import cron from 'node-cron';
 
 import format from 'date-fns/format';
-import serviceRatingRouter from './routes/serviceRating';
-import storeRouter from './routes/store';
-import categoryRouter from './routes/category';
-import ServiceRoute from './routes/service';
-import PostCommentRoute from './routes/postcomment';
-import PostRoute from './routes/post';
-import orderStatusRoute from './routes/orderStatus';
-import OrderRoute from './routes/order';
-import OrderStepRoute from './routes/serviceStep';
-import StoreNotifyRoute from './routes/storenotify';
-import userRouter from './routes/user';
-import authRouter from './routes/auth';
-import storeMemberShip from './routes/storeMemberShip';
-import storeRatingRouter from './routes/storeRating';
-import userRole from './routes/userRole';
-import UserNotifyRoute from './routes/usernotify';
-import StaffRoute from './routes/staff';
-import ActivityLog from './routes/activityLog';
-import BillRoute from './routes/bill';
-import VoucherRoute from './routes/voucher';
+import serviceRatingRouter from './src/routes/serviceRating';
+import storeRouter from './src/routes/store';
+import categoryRouter from './src/routes/category';
+import ServiceRoute from './src/routes/service';
+import PostCommentRoute from './src/routes/postcomment';
+import PostRoute from './src/routes/post';
+import orderStatusRoute from './src/routes/orderStatus';
+import OrderRoute from './src/routes/order';
+import OrderStepRoute from './src/routes/serviceStep';
+import StoreNotifyRoute from './src/routes/storenotify';
+import userRouter from './src/routes/user';
+import authRouter from './src/routes/auth';
+import storeMemberShip from './src/routes/storeMemberShip';
+import storeRatingRouter from './src/routes/storeRating';
+import userRole from './src/routes/userRole';
+import UserNotifyRoute from './src/routes/usernotify';
+import StaffRoute from './src/routes/staff';
+import ActivityLog from './src/routes/activityLog';
+import BillRoute from './src/routes/bill';
+import VoucherRoute from './src/routes/voucher';
 import {
   createNotify,
   createUserNotify,
   updateNotifyStatus,
-} from './socket/controller';
+} from './src/socket/controller';
 
 const app = express();
 const swaggerJSDocs = YAML.load('./api.yaml');
