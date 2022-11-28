@@ -100,7 +100,17 @@ io.on('connection', (socket) => {
     const newNotify = await createUserNotify(data);
     io.emit('receive-user-notify', newNotify);
   });
+
+  socket.on('rated-service', () => {
+    io.emit('receive-new-rated');
+  });
 });
+
+const job = cron.schedule('* * * * * *', () => {
+  io.emit('receive-new-rated');
+});
+
+job.start();
 
 mongoose
   .connect(process.env.MONGODB_URI)

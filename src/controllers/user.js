@@ -260,7 +260,7 @@ export const getVerifyCode = async (req, res) => {
 export const listOrdered = async (req, response) => {
   try {
     const orders = await Order.find({});
-    let userIds = [];
+    const userIds = [];
     orders.forEach((order) => {
       if (order.userId !== null) {
         let foundUser = false;
@@ -285,19 +285,19 @@ export const listOrdered = async (req, response) => {
           }
         }
         if (foundUser === false) {
-          let serviceIds = [];
+          const serviceIds = [];
           order.servicesRegistered.forEach((service) => {
             serviceIds.push(service.service.toHexString());
           });
           userIds.push({
             userId: order.userId.toHexString(),
-            serviceIds: serviceIds,
+            serviceIds,
           });
         }
       }
     });
 
-    let _userList = [];
+    const _userList = [];
     for (let i = 0; i < userIds.length; i++) {
       const user = await User.findOne(
         { _id: userIds[i].userId },
@@ -305,7 +305,7 @@ export const listOrdered = async (req, response) => {
       )
         .populate('roleId', 'name')
         .exec();
-      let services = [];
+      const services = [];
       for (let j = 0; j < userIds[i].serviceIds.length; j++) {
         const service = await Service.findOne(
           { _id: userIds[i].serviceIds[j] },
@@ -314,7 +314,7 @@ export const listOrdered = async (req, response) => {
         services.push(service);
       }
       if (user !== null) {
-        _userList.push({ user: user, usedServices: services });
+        _userList.push({ user, usedServices: services });
       }
     }
     const userList = _userList.filter(

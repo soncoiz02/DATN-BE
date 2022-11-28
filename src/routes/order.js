@@ -35,7 +35,7 @@ route.get('/getOrderByDate', getOrderByDate);
 
 route.get('/getOrderByUserAndDate', getOrderByUser);
 
-route.get('/getFutureOrderByStore/:id', getFutureOrderByStore);
+route.get('/getFutureOrder', getFutureOrderByStore);
 
 route.get('/getOrderByStaffCategory', getOrderByStaffCategory);
 

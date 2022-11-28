@@ -1,10 +1,11 @@
+import { decode } from 'jsonwebtoken';
+import Order from '../models/order';
 import ServiceRating from '../models/serviceRating';
 
 // eslint-disable-next-line import/prefer-default-export
 export const createServeRating = async (req, res) => {
   try {
     const serviceRating = await new ServiceRating(req.body).save();
-    console.log(serviceRating);
     res.json(serviceRating);
   } catch (error) {
     res.status(400).json({
@@ -72,7 +73,9 @@ export const readServeRating = async (req, res) => {
 export const getAllServiceRated = async (req, res) => {
   try {
     const { serviceId } = req.query;
-    const data = await ServiceRating.find({ serviceId }).exec();
+    const data = await ServiceRating.find({ serviceId })
+      .populate('userId')
+      .exec();
     const avgRated = (
       data.reduce((prev, item) => prev + item.rate, 0) / data.length
     ).toFixed(1);
@@ -99,6 +102,41 @@ export const getBestRatedServices = async (req, res) => {
     let serviceRating = await ServiceRating.find({}).populate('userId').exec();
     serviceRating = serviceRating.sort((a, b) => b.rate - a.rate);
     res.json(serviceRating.slice(0, 4));
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+    });
+  }
+};
+
+export const getUserRated = async (req, res) => {
+  try {
+    const userId = decode(req.token)._id;
+    const { serviceId } = req.query;
+    const serviceRated = await ServiceRating.findOne({
+      userId,
+      serviceId,
+    }).exec();
+    if (serviceRated) return res.json({ haveRated: true });
+    res.json({ haveRated: false });
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+    });
+  }
+};
+
+export const getServiceOrderByUser = async (req, res) => {
+  try {
+    const userId = decode(req.token)._id;
+    const { serviceId } = req.query;
+    const serviceRated = await Order.findOne({
+      userId,
+      'servicesRegistered.service': serviceId,
+      status: '634e59b757b7ea792917962c',
+    }).exec();
+    if (serviceRated) return res.json({ haveUsedService: true });
+    res.json({ haveUsedService: false });
   } catch (error) {
     res.status(400).json({
       message: error.message,
