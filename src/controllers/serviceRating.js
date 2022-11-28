@@ -1,5 +1,7 @@
 import { decode } from 'jsonwebtoken';
+import mongoose from 'mongoose';
 import Order from '../models/order';
+import Service from '../models/service';
 import ServiceRating from '../models/serviceRating';
 
 // eslint-disable-next-line import/prefer-default-export
@@ -137,6 +139,86 @@ export const getServiceOrderByUser = async (req, res) => {
     }).exec();
     if (serviceRated) return res.json({ haveUsedService: true });
     res.json({ haveUsedService: false });
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+    });
+  }
+};
+
+export const getServiceRatedPerPage = async (req, res) => {
+  try {
+    const { page } = req.query;
+    const limit = 10;
+    const pageSkip = (page - 1) * limit;
+    const service = await Service.findOne({ serviceId: req.params.id }).exec();
+    const rated = await ServiceRating.find({ serviceId: req.params.id })
+      .sort([['createdAt', -1]])
+      .populate('userId')
+      .skip(pageSkip)
+      .limit(limit)
+      .exec();
+    const total = await ServiceRating.countDocuments({
+      serviceId: req.params.id,
+    }).exec();
+    const detail = await Promise.all([
+      ServiceRating.countDocuments({
+        serviceId: req.params.id,
+        rate: 1,
+      }).exec(),
+      ServiceRating.countDocuments({
+        serviceId: req.params.id,
+        rate: 2,
+      }).exec(),
+      ServiceRating.countDocuments({
+        serviceId: req.params.id,
+        rate: 3,
+      }).exec(),
+      ServiceRating.countDocuments({
+        serviceId: req.params.id,
+        rate: 4,
+      }).exec(),
+      ServiceRating.countDocuments({
+        serviceId: req.params.id,
+        rate: 5,
+      }).exec(),
+    ]);
+    const detailRated = detail.map((item, index) => ({
+      star: index + 1,
+      count: item,
+    }));
+    if (total > 0) {
+      const avg = await ServiceRating.aggregate([
+        {
+          $match: {
+            serviceId: new mongoose.Types.ObjectId(req.params.id),
+          },
+        },
+        {
+          $group: {
+            _id: '_id',
+            avg: {
+              $avg: '$rate',
+            },
+          },
+        },
+      ]);
+
+      return res.json({
+        service,
+        total,
+        detailRated,
+        avg: avg[0].avg,
+        listRated: rated,
+      });
+    }
+    res.json({
+      service,
+      total,
+      avg: 0,
+      detailRated,
+      listRated: rated,
+    });
   } catch (error) {
     res.status(400).json({
       message: error.message,
