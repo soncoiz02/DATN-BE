@@ -4,6 +4,7 @@ import {
   getAllServiceRated,
   getBestRatedServices,
   getServiceOrderByUser,
+  getServiceRatedPerPage,
   getUserRated,
   listServeRating,
   readServeRating,
@@ -23,5 +24,6 @@ route.delete('/service-rating/:id', removeServeRating);
 route.put('/service-rating/:id', updateServeRating);
 route.get('/user-rated', verifyToken, getUserRated);
 route.get('/service-used-by-user', verifyToken, getServiceOrderByUser);
+route.get('/service-rated-per-page/:id', getServiceRatedPerPage);
 
 export default route;

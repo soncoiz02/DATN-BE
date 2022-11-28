@@ -106,7 +106,7 @@ io.on('connection', (socket) => {
   });
 });
 
-const job = cron.schedule('* * * * * *', () => {
+const job = cron.schedule('30 * * * * *', () => {
   io.emit('receive-new-rated');
 });
 
