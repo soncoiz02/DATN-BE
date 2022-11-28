@@ -5,6 +5,7 @@ import {
   getStoreStaff,
   getVerifyCode,
   listOrdered,
+  listServiceByUser,
   listUser,
   removeUser,
   updateUser,
@@ -20,7 +21,7 @@ router.put('/user', verifyToken, updateUser);
 router.get('/user/:id', GetoneUser);
 router.delete('/user/:id', removeUser);
 router.get('/store-staff/:id', getStoreStaff);
-
+router.get('/user/ListServiceByUser/:id', listServiceByUser);
 router.put('/change-password', verifyToken, changePassword);
 
 router.post('/get-verify-code', getVerifyCode);
