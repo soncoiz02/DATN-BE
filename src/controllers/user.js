@@ -327,3 +327,39 @@ export const listOrdered = async (req, response) => {
     });
   }
 };
+
+export const listServiceByUser = async (req, response) => {
+  try {
+    const _orders = await Order.find({ userId: req.params.id })
+      .populate('status')
+      .exec();
+    const orders = _orders.filter((order) => order.status.type === 'paid');
+    let serviceIds = [];
+    orders.forEach((order) => {
+      order.servicesRegistered.forEach((service) => {
+        if (serviceIds.indexOf(service.service.toString()) < 0) {
+          serviceIds.push(service.service.toString());
+        }
+      });
+    });
+    // console.log(serviceIds);
+
+    let services = [];
+    for (let i = 0; i < serviceIds.length; i++) {
+      const service = await Service.findOne(
+        { _id: serviceIds[i] },
+        'name price duration'
+      ).exec();
+
+      if (service === null) {
+        continue;
+      }
+      services.push(service);
+    }
+    response.json(services);
+  } catch (error) {
+    return response.status(400).json({
+      message: error.message,
+    });
+  }
+};
