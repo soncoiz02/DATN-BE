@@ -32,6 +32,7 @@ import StaffRoute from './src/routes/staff';
 import ActivityLog from './src/routes/activityLog';
 import BillRoute from './src/routes/bill';
 import VoucherRoute from './src/routes/voucher';
+import StatisticRoute from './src/routes/statistic';
 import {
   createNotify,
   createUserNotify,
@@ -74,6 +75,7 @@ app.use('/api', StaffRoute);
 app.use('/api', ActivityLog);
 app.use('/api', BillRoute);
 app.use('/api', VoucherRoute);
+app.use('/api', StatisticRoute);
 
 let clientId = '';
 
