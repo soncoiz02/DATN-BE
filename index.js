@@ -32,6 +32,7 @@ import StaffRoute from './src/routes/staff';
 import ActivityLog from './src/routes/activityLog';
 import BillRoute from './src/routes/bill';
 import VoucherRoute from './src/routes/voucher';
+import StatisticRoute from './src/routes/statistic';
 import {
   createNotify,
   createUserNotify,
@@ -53,6 +54,9 @@ const io = new Server(server, {
 
 app.use(cors());
 app.use(express.json());
+app.get('/', (req, res) => {
+  res.json('Wellcome');
+});
 app.use('/api', serviceRatingRouter);
 app.use('/api', storeRouter);
 app.use('/api', categoryRouter);
@@ -74,6 +78,7 @@ app.use('/api', StaffRoute);
 app.use('/api', ActivityLog);
 app.use('/api', BillRoute);
 app.use('/api', VoucherRoute);
+app.use('/api', StatisticRoute);
 
 let clientId = '';
 
@@ -106,7 +111,7 @@ io.on('connection', (socket) => {
   });
 });
 
-const job = cron.schedule('* * * * * *', () => {
+const job = cron.schedule('30 * * * * *', () => {
   io.emit('receive-new-rated');
 });
 

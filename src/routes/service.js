@@ -30,7 +30,7 @@ route.delete('/service/:id', remove);
 // update
 route.put('/service/:id', update);
 // chi tiet
-route.get('/service/:id', read);
+route.get('/service/:slug', read);
 
 // đường dẫn như này nhé  /api/search?q= tên
 route.post('/search-service', search);

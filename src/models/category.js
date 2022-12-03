@@ -6,9 +6,16 @@ const categoryServiece = new Schema(
       type: String,
       required: true,
     },
+    slug: {
+      type: String,
+      lowercase: true,
+      unique: true,
+      index: true,
+    },
     status: {
       type: Number,
       required: true,
+      default: 0,
     },
     storeId: {
       type: ObjectId,

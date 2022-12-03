@@ -22,7 +22,7 @@ export const register = async (request, response) => {
       phone,
       name,
       avt,
-      roleId: '6336718c9f0cdce7e66cba12',
+      // db mới đăng ký khách hàng
     }).save();
     const token = Jwt.sign({ _id: user.id }, '123456', {
       expiresIn: 60 * 60 * 24,
@@ -95,6 +95,7 @@ export const login = async (request, response) => {
       token,
       user: userData,
     });
+    console.log(userData);
   } catch (error) {
     response.status(400).json({
       message: error.message,

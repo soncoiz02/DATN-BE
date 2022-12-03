@@ -1,4 +1,5 @@
 import { endOfDay, endOfToday, startOfDay, startOfToday } from 'date-fns';
+import { decode } from 'jsonwebtoken';
 import mongoose from 'mongoose';
 import ActivityLog from '../models/activityLog';
 import Order from '../models/order';
@@ -606,6 +607,46 @@ export const filterOrder = async (req, res) => {
       .sort([[sortField || 'createdAt', sortOrder || -1]])
       .exec();
     res.json({ total, orders });
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+    });
+  }
+};
+
+export const getUserOrder = async (req, res) => {
+  try {
+    const userId = decode(req.token)._id;
+    const { page, status } = req.query;
+    const limit = 12;
+    const pageSkip = (page - 1) * limit;
+
+    const orders = await Order.find({ userId, ...(status && { status }) })
+      .populate({
+        path: 'servicesRegistered.service',
+        model: 'Service',
+      })
+      .populate({
+        path: 'servicesRegistered.staff',
+        model: 'User',
+      })
+      .populate('voucher')
+      .populate('status')
+      .skip(pageSkip)
+      .limit(limit)
+      .sort([['startDate', -1]])
+      .exec();
+
+    const total = await Order.countDocuments({
+      userId,
+      ...(status && { status }),
+    }).exec();
+
+    res.json({
+      total,
+      data: orders,
+      limit,
+    });
   } catch (error) {
     res.status(400).json({
       message: error.message,

@@ -12,7 +12,7 @@ const router = Router();
 
 router.post('/category', create);
 router.get('/category', list);
-router.get('/category/:id', read);
+router.get('/category/:slug', read);
 router.delete('/category/:id', remove);
 router.put('/category/:id', update);
 
