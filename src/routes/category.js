@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import {
   create,
+  getBySlug,
   list,
   read,
   remove,
@@ -12,7 +13,8 @@ const router = Router();
 
 router.post('/category', create);
 router.get('/category', list);
-router.get('/category/:slug', read);
+router.get('/category/:id', read);
+router.get('/category-slug/:slug', getBySlug);
 router.delete('/category/:id', remove);
 router.put('/category/:id', update);
 

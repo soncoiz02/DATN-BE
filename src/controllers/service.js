@@ -94,10 +94,37 @@ export const update = async (req, res) => {
 
 export const read = async (req, res) => {
   try {
-    const service = await Service.findOne({ slug: req.params.slug })
+    const service = await Service.findOne({ _id: req.params.id })
       .populate('categoryId')
       .exec();
     const rated = await ServiceRating.find({ serviceId: req.params.id }).exec();
+    const ratedAvg =
+      rated.length > 0
+        ? (
+            rated.reduce((prev, rateItem) => prev + rateItem.rate, 0) /
+            rated.length
+          ).toFixed(2)
+        : 0;
+    res.json({
+      ...service._doc,
+      rated: {
+        total: rated.length,
+        avg: ratedAvg,
+      },
+    });
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+    });
+  }
+};
+
+export const getBySlug = async (req, res) => {
+  try {
+    const service = await Service.findOne({ slug: req.params.slug })
+      .populate('categoryId')
+      .exec();
+    const rated = await ServiceRating.find({ serviceId: service._id }).exec();
     const ratedAvg =
       rated.length > 0
         ? (
@@ -304,11 +331,19 @@ export const filterByCatePrice = async (req, res) => {
 
 export const getServiceByCate = async (req, res) => {
   try {
-    const { cateId } = req.query;
+    const { cateSlug } = req.query;
     const services = await Service.aggregate([
       {
+        $lookup: {
+          from: 'categories',
+          foreignField: '_id',
+          localField: 'categoryId',
+          as: 'category',
+        },
+      },
+      {
         $match: {
-          categoryId: new mongoose.Types.ObjectId(cateId),
+          'category.slug': cateSlug,
         },
       },
       {

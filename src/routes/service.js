@@ -11,6 +11,7 @@ import {
   filterByCatePrice,
   getServiceByCate,
   getServicePerPage,
+  getBySlug,
 } from '../controllers/service';
 
 const route = Router();
@@ -30,7 +31,8 @@ route.delete('/service/:id', remove);
 // update
 route.put('/service/:id', update);
 // chi tiet
-route.get('/service/:slug', read);
+route.get('/service/:id', read);
+route.get('/service-slug/:slug', getBySlug);
 
 // đường dẫn như này nhé  /api/search?q= tên
 route.post('/search-service', search);
