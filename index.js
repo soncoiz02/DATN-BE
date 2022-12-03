@@ -54,7 +54,7 @@ const io = new Server(server, {
 
 app.use(cors());
 app.use(express.json());
-app.use('/', (req, res) => {
+app.get('/', (req, res) => {
   res.json('Wellcome');
 });
 app.use('/api', serviceRatingRouter);
