@@ -7,12 +7,11 @@
     "node": "14.x"
   },
   "scripts": {
-    "start": "nodemon --exec babel-node ./index.js",
+    "start": "nodemon ./index.js --exec babel-node -e js ",
     "lint": "eslint --ext .js ./src",
     "lint:fix": "eslint --fix --ext .js ./src",
     "format": "npm run lint --fix & prettier --write ./src",
-    "postinstall": "husky install",
-    "build": "babel index.js --out-file index-compiled.js"
+    "postinstall": "husky install"
   },
   "keywords": [],
   "author": "",
@@ -31,7 +30,7 @@
     "eslint-plugin-prettier": "^4.2.1",
     "husky": "^8.0.1",
     "lint-staged": "^13.0.3",
-    "nodemon": "^2.0.20",
+    "nodemon": "^2.0.19",
     "prettier": "^2.7.1"
   },
   "dependencies": {
