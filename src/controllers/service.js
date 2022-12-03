@@ -1,9 +1,9 @@
 /* eslint-disable no-underscore-dangle */
 import mongoose from 'mongoose';
+import slugify from 'slugify';
 import Service from '../models/service';
 import ServiceStep from '../models/serviceStep';
 import ServiceRating from '../models/serviceRating';
-import slugify from 'slugify';
 
 // eslint-disable-next-line import/prefer-default-export
 export const create = async (req, res) => {
@@ -98,7 +98,6 @@ export const read = async (req, res) => {
       .populate('categoryId')
       .exec();
     const rated = await ServiceRating.find({ serviceId: req.params.id }).exec();
-    const steps = await ServiceStep.find({ serviceId: req.params.id }).exec();
     const ratedAvg =
       rated.length > 0
         ? (
@@ -107,8 +106,7 @@ export const read = async (req, res) => {
           ).toFixed(2)
         : 0;
     res.json({
-      ...service,
-      steps,
+      ...service._doc,
       rated: {
         total: rated.length,
         avg: ratedAvg,
