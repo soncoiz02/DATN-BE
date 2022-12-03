@@ -37,7 +37,7 @@ const userSchema = new mongoose.Schema(
     roleId: {
       type: ObjectId,
       ref: 'UserRole',
-      default: '6336718c9f0cdce7e66cba12',
+      default: '636d184aeac3f0af6725473b',
     },
   },
   { timestamps: true }

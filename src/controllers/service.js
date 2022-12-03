@@ -3,9 +3,11 @@ import mongoose from 'mongoose';
 import Service from '../models/service';
 import ServiceStep from '../models/serviceStep';
 import ServiceRating from '../models/serviceRating';
+import slugify from 'slugify';
 
 // eslint-disable-next-line import/prefer-default-export
 export const create = async (req, res) => {
+  req.body.slug = slugify(req.body.name);
   try {
     const service = await new Service(req.body).save();
     res.json(service);
@@ -73,11 +75,15 @@ export const remove = async (req, res) => {
 };
 
 export const update = async (req, res) => {
+  const options = { new: true };
+  req.body.slug = slugify(req.body.name);
+
   try {
     const service = await Service.findOneAndUpdate(
       { _id: req.params.id },
-      req.body
-    );
+      req.body,
+      options
+    ).exec();
     res.json(service);
   } catch (error) {
     res.status(400).json({
@@ -88,7 +94,7 @@ export const update = async (req, res) => {
 
 export const read = async (req, res) => {
   try {
-    const service = await Service.findOne({ _id: req.params.id })
+    const service = await Service.findOne({ slug: req.params.slug })
       .populate('categoryId')
       .exec();
     const rated = await ServiceRating.find({ serviceId: req.params.id }).exec();
@@ -101,7 +107,7 @@ export const read = async (req, res) => {
           ).toFixed(2)
         : 0;
     res.json({
-      ...service._doc,
+      ...service,
       steps,
       rated: {
         total: rated.length,

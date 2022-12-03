@@ -28,12 +28,14 @@ const serviceSchema = new Schema(
       type: Number,
       required: true,
     },
-    totalStaff: {
-      type: Number,
-      default: 0,
-    },
     timeSlot: {
       type: Array,
+    },
+    slug: {
+      type: String,
+      lowercase: true,
+      unique: true,
+      index: true,
     },
     categoryId: {
       type: ObjectId,

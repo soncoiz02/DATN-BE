@@ -23,7 +23,7 @@ const storeSchema = new Schema(
       required: true,
     },
     hotline: {
-      type: Number,
+      type: String,
       required: true,
     },
     open: {
