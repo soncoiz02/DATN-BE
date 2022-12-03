@@ -10,8 +10,35 @@ import service from '../models/service';
 
 export const createStaff = async (req, res) => {
   try {
-    const staff = await new Staff(req.body).save();
-    res.json(staff);
+    const { cateId, userData } = req.body;
+    const haveUsername = await User.findOne({
+      username: userData.username,
+    }).exec();
+    const haveEmail = await User.findOne({ email: userData.email }).exec();
+    const havePhone = await User.findOne({ phone: userData.phone }).exec();
+    if (haveUsername) {
+      return res.status(400).json({
+        message: 'Tên tài khoản đã tồn tại',
+        field: 'username',
+      });
+    }
+    if (haveEmail) {
+      return res.status(400).json({
+        message: 'Email đã tồn tại',
+        field: 'email',
+      });
+    }
+    if (havePhone) {
+      return res.status(400).json({
+        message: 'Số điện thoại đã tồn tại',
+        field: 'phone',
+      });
+    }
+    const newUser = await User(userData).save();
+    await Staff({ staff: newUser._id, category: cateId }).save();
+    res.json({
+      message: 'Tạo mới nhân viên thành công',
+    });
   } catch (error) {
     res.status(400).json({
       message: error.message,
@@ -258,6 +285,103 @@ export const getStaffInTimeSlotAllService = async (req, res) => {
     // lấy tổng số nv ra check
 
     res.json(filteredServices);
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+    });
+  }
+};
+
+export const getStaffPerPage = async (req, res) => {
+  try {
+    const { page, name, email, phone, category, birthday } = req.query;
+    const limit = 10;
+    const pageSkip = (page - 1) * limit;
+    const filter = {
+      ...(name && {
+        name: { $regex: name, $options: 'i' },
+      }),
+      ...(email && {
+        email: { $regex: email, $options: 'i' },
+      }),
+      ...(phone && {
+        phone: { $regex: phone, $options: 'i' },
+      }),
+      ...(category && {
+        'category._id': new mongoose.Types.ObjectId(category),
+      }),
+      ...(birthday && {
+        birthday,
+      }),
+    };
+
+    const staffs = await User.aggregate([
+      {
+        $lookup: {
+          from: 'staffs',
+          foreignField: 'staff',
+          localField: '_id',
+          as: 'staff',
+        },
+      },
+      {
+        $lookup: {
+          from: 'categories',
+          foreignField: '_id',
+          localField: 'staff.category',
+          as: 'category',
+        },
+      },
+      {
+        $match: {
+          ...filter,
+          roleId: new mongoose.Types.ObjectId('6336719e9f0cdce7e66cba16'),
+        },
+      },
+      {
+        $project: {
+          staff: 0,
+          password: 0,
+        },
+      },
+    ])
+      .limit(limit)
+      .skip(pageSkip);
+    const total = await User.aggregate([
+      {
+        $lookup: {
+          from: 'staffs',
+          foreignField: 'staff',
+          localField: '_id',
+          as: 'staff',
+        },
+      },
+      {
+        $lookup: {
+          from: 'categories',
+          foreignField: '_id',
+          localField: 'staff.category',
+          as: 'category',
+        },
+      },
+      {
+        $match: {
+          ...filter,
+          roleId: new mongoose.Types.ObjectId('6336719e9f0cdce7e66cba16'),
+        },
+      },
+      {
+        $project: {
+          staff: 0,
+        },
+      },
+      { $group: { _id: null, count: { $sum: 1 } } },
+    ]);
+
+    res.json({
+      total: total.length > 0 ? total[0].count : 0,
+      data: staffs.map((item) => ({ ...item, category: item.category[0] })),
+    });
   } catch (error) {
     res.status(400).json({
       message: error.message,

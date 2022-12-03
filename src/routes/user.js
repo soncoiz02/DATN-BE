@@ -4,6 +4,7 @@ import {
   GetoneUser,
   getStoreStaff,
   getVerifyCode,
+  listOrdered,
   listUser,
   removeUser,
   updateUser,
@@ -12,10 +13,11 @@ import { verifyToken } from '../middlewares/token';
 
 const router = Router();
 
-router.get('/user/:id', GetoneUser);
 router.get('/user', listUser);
+router.get('/user/listOrdered', listOrdered);
 router.put('/user', verifyToken, updateUser);
 
+router.get('/user/:id', GetoneUser);
 router.delete('/user/:id', removeUser);
 router.get('/store-staff/:id', getStoreStaff);
 

@@ -3,6 +3,8 @@ import { decode } from 'jsonwebtoken';
 import mongoose from 'mongoose';
 import User from '../models/user';
 import sendEmail from '../utils/sendEmail';
+import Order from '../models/order';
+import Service from '../models/service';
 
 // eslint-disable-next-line import/prefer-default-export
 export const GetoneUser = async (request, response) => {
@@ -250,6 +252,77 @@ export const getVerifyCode = async (req, res) => {
     res.json(code);
   } catch (error) {
     res.status(400).json({
+      message: error.message,
+    });
+  }
+};
+
+export const listOrdered = async (req, response) => {
+  try {
+    const orders = await Order.find({});
+    const userIds = [];
+    orders.forEach((order) => {
+      if (order.userId !== null) {
+        let foundUser = false;
+        for (let i = 0; i < userIds.length; i++) {
+          if (userIds[i].userId === order.userId.toHexString()) {
+            foundUser = true;
+            order.servicesRegistered.forEach((service) => {
+              let foundService = false;
+              for (let j = 0; j < userIds[i].serviceIds.length; j++) {
+                if (
+                  userIds[i].serviceIds[j] === service.service.toHexString()
+                ) {
+                  foundService = true;
+                  break;
+                }
+              }
+              if (foundService === false) {
+                userIds[i].serviceIds.push(service.service.toHexString());
+              }
+            });
+            break;
+          }
+        }
+        if (foundUser === false) {
+          const serviceIds = [];
+          order.servicesRegistered.forEach((service) => {
+            serviceIds.push(service.service.toHexString());
+          });
+          userIds.push({
+            userId: order.userId.toHexString(),
+            serviceIds,
+          });
+        }
+      }
+    });
+
+    const _userList = [];
+    for (let i = 0; i < userIds.length; i++) {
+      const user = await User.findOne(
+        { _id: userIds[i].userId },
+        'username name birthday phone email avt'
+      )
+        .populate('roleId', 'name')
+        .exec();
+      const services = [];
+      for (let j = 0; j < userIds[i].serviceIds.length; j++) {
+        const service = await Service.findOne(
+          { _id: userIds[i].serviceIds[j] },
+          'name price'
+        ).exec();
+        services.push(service);
+      }
+      if (user !== null) {
+        _userList.push({ user, usedServices: services });
+      }
+    }
+    const userList = _userList.filter(
+      (user) => user.user.roleId.name === 'Customer'
+    );
+    response.json(userList);
+  } catch (error) {
+    return response.status(400).json({
       message: error.message,
     });
   }

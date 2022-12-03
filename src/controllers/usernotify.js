@@ -14,8 +14,20 @@ export const create = async (request, response) => {
 };
 export const list = async (request, response) => {
   try {
-    const userNotify = await UserNotify.find({}).exec();
-    response.json(userNotify);
+    const userId = decode(request.token)._id;
+    const { page } = request.query;
+    const limit = 10 * page;
+    const userNotify = await UserNotify.find({ userId })
+      .limit(limit)
+      .sort([['createdAt', -1]])
+      .exec();
+    const total = await UserNotify.countDocuments({ userId }).exec();
+    const totalUnread = await UserNotify.count({ userId, status: 0 }).exec();
+    response.json({
+      total,
+      totalUnread,
+      data: userNotify,
+    });
   } catch (error) {
     response.status(400).json({ message: error.message });
   }
@@ -59,10 +71,22 @@ export const update = async (request, response) => {
 export const staffNotify = async (req, res) => {
   try {
     const staffId = decode(req.token)._id;
+    const { page } = req.query;
+    const limit = 10 * page;
     const notify = await UserNotify.find({ userId: staffId })
+      .limit(limit)
       .sort([['createdAt', -1]])
       .exec();
-    res.json(notify);
+    const total = await UserNotify.countDocuments({ userId: staffId }).exec();
+    const totalUnread = await UserNotify.countDocuments({
+      userId: staffId,
+      status: 0,
+    }).exec();
+    res.json({
+      total,
+      totalUnread,
+      data: notify,
+    });
   } catch (error) {
     res.status(400).json({
       message: error.message,

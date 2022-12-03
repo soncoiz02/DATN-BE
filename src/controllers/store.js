@@ -96,68 +96,48 @@ export const updateStore = async (request, response) => {
   }
 };
 
-export const stRevenue = async (request, response) => {
+export const storeRevenue = async (request, response) => {
   try {
-    // console.log("storeId: " + request.params.id);
-    const category = await Category.find({ storeId: request.params.id }).exec();
-    // console.log("category: " + category);
+    const orders = await Order.find({ status: '634e59b757b7ea792917962c' })
+      .populate('voucher')
+      .exec();
 
-    let serviceIds = [];
-    for (let i = 0; i < category.length; i++) {
-      if (category[i].name === 'Danh mục không xác định') {
-        continue;
-      }
-      const service = await Service.find({
-        categoryId: category[i]._id,
-      }).exec();
-      for (let i = 0; i < service.length; i++) {
-        serviceIds.push(service[i]['_id']);
-      }
-    }
-    // console.log("serviceIds: " + serviceIds);
-
-    const _order = await Order.find({})
-      .populate('status', 'type')
-      .populate('servicesRegistered', 'service');
-
-    const order = _order.filter((order) => order.status.type === 'paid');
+    const services = await Service.find().exec();
 
     let _totalRevenue = 0;
-    let _totalOrders = 0;
+    let _totalOrders = [];
     let _totalByService = [];
-    for (let i = 0; i < serviceIds.length; i++) {
-      const _service = await Service.findOne({ _id: serviceIds[i] }).exec();
+    services.forEach((service) => {
       let _item = {};
-      _item.serviceId = serviceIds[i];
-      _item.name = _service.name;
+      _item.serviceId = service._id;
+      _item.name = service.name;
       _item.serviceRevenue = 0;
       _item.serviceOrder = 0;
-      for (let j = 0; j < order.length; j++) {
-        for (let k = 0; k < order[j].servicesRegistered.length; k++) {
-          let discount = 0;
-          if (serviceIds[i].equals(order[j].servicesRegistered[k].service)) {
-            if (order[j].voucher !== null) {
-              const _voucher = await Voucher.findOne({
-                _id: order[j].voucher,
-              }).exec();
-              discount =
-                _voucher.discount / 100 / order[j].servicesRegistered.length;
+      orders.forEach((order) => {
+        order.servicesRegistered.forEach((item) => {
+          if (item.service.toString() === service._id.toString()) {
+            if (_totalOrders.indexOf(order._id) < 0) {
+              _totalOrders.push(order._id);
             }
-            let actual_price = _service.price - _service.price * discount;
+            let actual_price =
+              order.voucher === null
+                ? service.price
+                : service.price *
+                  (1 -
+                    order.voucher.discount /
+                      100 /
+                      order.servicesRegistered.length);
             _item.serviceRevenue += actual_price;
             _item.serviceOrder += 1;
             _totalRevenue += actual_price;
-            _totalOrders += 1;
           }
-        }
-      }
-      if (_item.serviceOrder > 0) {
-        _totalByService.push(_item);
-      }
-    }
+        });
+      });
+      _totalByService.push(_item);
+    });
     response.json({
       revenue: _totalRevenue,
-      orders: _totalOrders,
+      orders: _totalOrders.length,
       services: _totalByService,
     });
   } catch (error) {

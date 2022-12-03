@@ -9,12 +9,14 @@ import {
   getOrderByStaffCategory,
   getOrderByUser,
   getTodayOrder,
+  getUserOrder,
   list,
   read,
   remove,
   searchOrder,
   update,
 } from '../controllers/order';
+import { verifyToken } from '../middlewares/token';
 
 const route = Router();
 
@@ -35,7 +37,7 @@ route.get('/getOrderByDate', getOrderByDate);
 
 route.get('/getOrderByUserAndDate', getOrderByUser);
 
-route.get('/getFutureOrderByStore/:id', getFutureOrderByStore);
+route.get('/getFutureOrder', getFutureOrderByStore);
 
 route.get('/getOrderByStaffCategory', getOrderByStaffCategory);
 
@@ -46,5 +48,7 @@ route.get('/today-order', getTodayOrder);
 route.get('/get-by-date', getByDate);
 
 route.get('/filter-order', filterOrder);
+
+route.get('/get-user-order', verifyToken, getUserOrder);
 
 export default route;

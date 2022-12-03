@@ -29,7 +29,6 @@ export const getOne = async (req, res) => {
 export const create = async (req, res) => {
   try {
     const { billData, activityLog, emailOption } = req.body;
-    // const bill = await new Bill(billData).save();
     const newOrder = await Order.findOneAndUpdate(
       { _id: billData.order },
       { status: '634e59b757b7ea792917962c' }
