@@ -1,9 +1,9 @@
 /* eslint-disable no-underscore-dangle */
 import mongoose from 'mongoose';
+import slugify from 'slugify';
 import Service from '../models/service';
 import ServiceStep from '../models/serviceStep';
 import ServiceRating from '../models/serviceRating';
-import slugify from 'slugify';
 
 // eslint-disable-next-line import/prefer-default-export
 export const create = async (req, res) => {
@@ -94,11 +94,10 @@ export const update = async (req, res) => {
 
 export const read = async (req, res) => {
   try {
-    const service = await Service.findOne({ slug: req.params.slug })
+    const service = await Service.findOne({ _id: req.params.id })
       .populate('categoryId')
       .exec();
     const rated = await ServiceRating.find({ serviceId: req.params.id }).exec();
-    const steps = await ServiceStep.find({ serviceId: req.params.id }).exec();
     const ratedAvg =
       rated.length > 0
         ? (
@@ -107,8 +106,34 @@ export const read = async (req, res) => {
           ).toFixed(2)
         : 0;
     res.json({
-      ...service,
-      steps,
+      ...service._doc,
+      rated: {
+        total: rated.length,
+        avg: ratedAvg,
+      },
+    });
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+    });
+  }
+};
+
+export const getBySlug = async (req, res) => {
+  try {
+    const service = await Service.findOne({ slug: req.params.slug })
+      .populate('categoryId')
+      .exec();
+    const rated = await ServiceRating.find({ serviceId: service._id }).exec();
+    const ratedAvg =
+      rated.length > 0
+        ? (
+            rated.reduce((prev, rateItem) => prev + rateItem.rate, 0) /
+            rated.length
+          ).toFixed(2)
+        : 0;
+    res.json({
+      ...service._doc,
       rated: {
         total: rated.length,
         avg: ratedAvg,
@@ -306,11 +331,19 @@ export const filterByCatePrice = async (req, res) => {
 
 export const getServiceByCate = async (req, res) => {
   try {
-    const { cateId } = req.query;
+    const { cateSlug } = req.query;
     const services = await Service.aggregate([
       {
+        $lookup: {
+          from: 'categories',
+          foreignField: '_id',
+          localField: 'categoryId',
+          as: 'category',
+        },
+      },
+      {
         $match: {
-          categoryId: new mongoose.Types.ObjectId(cateId),
+          'category.slug': cateSlug,
         },
       },
       {

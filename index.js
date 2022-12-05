@@ -1,38 +1,34 @@
-import swaggerUI from 'swagger-ui-express';
-import YAML from 'yamljs';
-
+import cors from 'cors';
+import dotenv from 'dotenv';
 import express from 'express';
 import http from 'http';
-import dotenv from 'dotenv';
-import cors from 'cors';
 import mongoose from 'mongoose';
 
 import { Server } from 'socket.io';
 
 import cron from 'node-cron';
 
-import format from 'date-fns/format';
-import serviceRatingRouter from './src/routes/serviceRating';
-import storeRouter from './src/routes/store';
-import categoryRouter from './src/routes/category';
-import ServiceRoute from './src/routes/service';
-import PostCommentRoute from './src/routes/postcomment';
-import PostRoute from './src/routes/post';
-import orderStatusRoute from './src/routes/orderStatus';
-import OrderRoute from './src/routes/order';
-import OrderStepRoute from './src/routes/serviceStep';
-import StoreNotifyRoute from './src/routes/storenotify';
-import userRouter from './src/routes/user';
-import authRouter from './src/routes/auth';
-import storeMemberShip from './src/routes/storeMemberShip';
-import storeRatingRouter from './src/routes/storeRating';
-import userRole from './src/routes/userRole';
-import UserNotifyRoute from './src/routes/usernotify';
-import StaffRoute from './src/routes/staff';
 import ActivityLog from './src/routes/activityLog';
+import authRouter from './src/routes/auth';
 import BillRoute from './src/routes/bill';
-import VoucherRoute from './src/routes/voucher';
+import categoryRouter from './src/routes/category';
+import OrderRoute from './src/routes/order';
+import orderStatusRoute from './src/routes/orderStatus';
+import PostRoute from './src/routes/post';
+import PostCommentRoute from './src/routes/postcomment';
+import ServiceRoute from './src/routes/service';
+import serviceRatingRouter from './src/routes/serviceRating';
+import OrderStepRoute from './src/routes/serviceStep';
+import StaffRoute from './src/routes/staff';
 import StatisticRoute from './src/routes/statistic';
+import storeRouter from './src/routes/store';
+import storeMemberShip from './src/routes/storeMemberShip';
+import StoreNotifyRoute from './src/routes/storenotify';
+import storeRatingRouter from './src/routes/storeRating';
+import userRouter from './src/routes/user';
+import UserNotifyRoute from './src/routes/usernotify';
+import userRole from './src/routes/userRole';
+import VoucherRoute from './src/routes/voucher';
 import {
   createNotify,
   createUserNotify,
@@ -40,26 +36,27 @@ import {
 } from './src/socket/controller';
 
 const app = express();
-const swaggerJSDocs = YAML.load('./api.yaml');
 
 const server = http.createServer(app);
 dotenv.config();
 
 const io = new Server(server, {
   cors: {
-    origin: process.env.CLIENT_URL,
+    origin: '*',
     methods: ['GET, POST'],
   },
 });
 
 app.use(cors());
 app.use(express.json());
+app.get('/', (req, res) => {
+  res.json('Wellcome');
+});
 app.use('/api', serviceRatingRouter);
 app.use('/api', storeRouter);
 app.use('/api', categoryRouter);
 app.use('/api', PostCommentRoute);
 app.use('/api', orderStatusRoute);
-app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerJSDocs));
 app.use('/api', ServiceRoute);
 app.use('/api', PostRoute);
 app.use('/api', OrderRoute);
