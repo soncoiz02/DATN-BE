@@ -6,6 +6,7 @@ import {
   getServiceRevenue,
   getStatisticByDate,
   getStatisticPerMonth,
+  getDashboardStatistic,
 } from '../controllers/statistic';
 
 const route = express.Router();
@@ -16,5 +17,6 @@ route.get('/get-statistic-by-month', getStatisticPerMonth);
 route.get('/get-service-revenue', getServiceRevenue);
 route.get('/get-revenue-by-date', getRevenueByDate);
 route.get('/get-revenue-by-month', getRevenueByMonth);
+route.get('/get-dashboard-statistic', getDashboardStatistic);
 
 export default route;

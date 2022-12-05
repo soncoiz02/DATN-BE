@@ -6,6 +6,7 @@ import {
   getByDate,
   getFutureOrderByStore,
   getOrderByDate,
+  getOrderByService,
   getOrderByStaffCategory,
   getOrderByUser,
   getTodayOrder,
@@ -48,6 +49,8 @@ route.get('/today-order', getTodayOrder);
 route.get('/get-by-date', getByDate);
 
 route.get('/filter-order', filterOrder);
+
+route.get('/get-order-by-service', getOrderByService);
 
 route.get('/get-user-order', verifyToken, getUserOrder);
 

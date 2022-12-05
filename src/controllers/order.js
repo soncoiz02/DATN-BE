@@ -653,3 +653,17 @@ export const getUserOrder = async (req, res) => {
     });
   }
 };
+
+export const getOrderByService = async (req, res) => {
+  try {
+    const { serviceId } = req.query;
+    const orders = await Order.find({
+      'servicesRegistered.service': serviceId,
+    }).exec();
+    res.json(orders);
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+    });
+  }
+};
