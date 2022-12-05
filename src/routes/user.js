@@ -7,7 +7,9 @@ import {
   listOrdered,
   listUser,
   removeUser,
+  resetPassword,
   updateUser,
+  verifyEmail,
 } from '../controllers/user';
 import { verifyToken } from '../middlewares/token';
 
@@ -24,5 +26,8 @@ router.get('/store-staff/:id', getStoreStaff);
 router.put('/change-password', verifyToken, changePassword);
 
 router.post('/get-verify-code', getVerifyCode);
+
+router.post('/verify-email', verifyEmail);
+router.post('/reset-password', resetPassword);
 
 export default router;

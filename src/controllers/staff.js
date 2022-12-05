@@ -1,12 +1,11 @@
-import mongoose from 'mongoose';
 import { endOfDay, startOfDay } from 'date-fns';
-import Staff from '../models/staff';
+import mongoose from 'mongoose';
 import Order from '../models/order';
-import { dateToHourNumber } from '../utils/dateToHourNumber';
 import Service from '../models/service';
+import Staff from '../models/staff';
 import User from '../models/user';
+import { dateToHourNumber } from '../utils/dateToHourNumber';
 import roundedNumber from '../utils/roundedNumber';
-import service from '../models/service';
 
 export const createStaff = async (req, res) => {
   try {
