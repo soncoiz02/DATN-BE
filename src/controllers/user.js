@@ -117,6 +117,24 @@ export const getStoreStaff = async (req, res) => {
   }
 };
 
+const generateVerifyCode = () => {
+  const randomNum = Math.floor(Math.random() * 1000);
+
+  let code = '';
+
+  if (randomNum < 1000 && randomNum >= 100) {
+    code = `0${randomNum}`;
+  } else if (randomNum >= 10) {
+    code = `00${randomNum}`;
+  } else if (randomNum >= 0) {
+    code = `000${randomNum}`;
+  } else {
+    code = randomNum;
+  }
+
+  return code;
+};
+
 export const changePassword = async (req, res) => {
   try {
     const userId = decode(req.token)._id;
@@ -149,22 +167,135 @@ export const changePassword = async (req, res) => {
   }
 };
 
+export const verifyEmail = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email }).exec();
+    if (!user) {
+      res.status(400).json({
+        message: 'Email không tồn tại',
+      });
+    }
+    const code = generateVerifyCode();
+
+    const htmlTemplate = `
+    <table
+      width="100%"
+      cellpadding="0"
+      cellspacing="0"
+      role="presentation"
+      style="
+        max-width: 570px;
+        background-color: #fff;
+        margin: 0 auto;
+        padding: 30px;
+      "
+    >
+      <tr>
+        <td align="center">
+          <table
+            width="100%"
+            cellpadding="0"
+            cellspacing="0"
+            role="presentation"
+          >
+            <tr>
+              <td>
+              <div style="border-radius: 50%; width: 50px; height: 50px; overflow: hidden; margin: 0 auto;">
+                    <img src="https://res.cloudinary.com/deqhqs09b/image/upload/v1667559552/hq5qjqy4esmdfyvxxkqr.png" alt="" style="width: 100%; height: 100%; object-fit: cover;" />
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td cellpadding="0" cellspacing="0">
+                <table
+                  width="100%"
+                  cellpadding="0"
+                  cellspacing="0"
+                  role="presentation"
+                  style="
+                    font-family: 'Helvetica Neue', Arial, sans-serif;
+                    line-height: 22px;
+                  "
+                >
+                  <tr>
+                    <td>
+                      <h2 style="text-align: center; color: #ff6073;">
+                        Beauty Paradise
+                      </h2>
+                      <h3 style="text-align: center;">
+                        Gửi bạn mã xác nhận
+                      </h3>
+                      <p
+                        style="
+                          font-size: 50px;
+                          font-weight: bold;
+                          letter-spacing: 3px;
+                          padding: 15px 25px;
+                          background: #ff6073;
+                          color: white;
+                          text-align: center;
+                          width: 200px;
+                          margin: 0 auto;
+                        "
+                      >
+                        ${code}
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+    `;
+
+    const emailOption = {
+      from: 'beautyparadise1102@gmail.com',
+      to: email,
+      subject: `Beauty Paradise gửi bạn mã xác nhận.`,
+      html: htmlTemplate,
+    };
+
+    sendEmail(emailOption);
+
+    res.json(code);
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+    });
+  }
+};
+
+export const resetPassword = async (req, res) => {
+  try {
+    const { email, newPassword } = req.body;
+    const hashPassword = createHmac('Sha256', 'abc')
+      .update(newPassword)
+      .digest('hex');
+    await User.findOneAndUpdate(
+      { email },
+      { password: hashPassword },
+      { new: true }
+    );
+
+    res.json({
+      message: 'Đổi mật khẩu mới thành công',
+    });
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+    });
+  }
+};
+
 export const getVerifyCode = async (req, res) => {
   try {
     const { email } = req.body;
-    const randomNum = Math.floor(Math.random() * 1000);
 
-    let code = '';
-
-    if (randomNum < 1000 && randomNum >= 100) {
-      code = `0${randomNum}`;
-    } else if (randomNum >= 10) {
-      code = `00${randomNum}`;
-    } else if (randomNum >= 0) {
-      code = `000${randomNum}`;
-    } else {
-      code = randomNum;
-    }
+    const code = generateVerifyCode();
 
     const htmlTemplate = `
     <table
