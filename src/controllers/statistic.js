@@ -1,16 +1,8 @@
-import {
-  eachWeekOfInterval,
-  endOfDay,
-  endOfMonth,
-  endOfWeek,
-  startOfDay,
-  startOfMonth,
-  startOfToday,
-  startOfWeek,
-} from 'date-fns';
+import { endOfDay, endOfMonth, startOfDay, startOfMonth } from 'date-fns';
 import mongoose from 'mongoose';
 import Order from '../models/order';
 import Service from '../models/service';
+import User from '../models/user';
 
 // eslint-disable-next-line import/prefer-default-export
 export const getBestStatistic = async (req, res) => {
@@ -557,6 +549,97 @@ export const getRevenueByMonth = async (req, res) => {
     );
 
     res.json(listRevenueByMonth);
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+    });
+  }
+};
+
+export const getDashboardStatistic = async (req, res) => {
+  try {
+    const users = await User.aggregate([
+      {
+        $lookup: {
+          from: 'orders',
+          foreignField: 'userId',
+          localField: '_id',
+          as: 'orders',
+        },
+      },
+      {
+        $project: {
+          item: 1,
+          totalOrders: {
+            $size: '$orders',
+          },
+        },
+      },
+      {
+        $match: {
+          totalOrders: {
+            $gte: 1,
+          },
+        },
+      },
+    ]);
+
+    const orders = await Order.aggregate([
+      {
+        $lookup: {
+          from: 'services',
+          foreignField: '_id',
+          localField: 'servicesRegistered.service',
+          as: 'service',
+        },
+      },
+      {
+        $lookup: {
+          from: 'vouchers',
+          foreignField: '_id',
+          localField: 'voucher',
+          as: 'voucher',
+        },
+      },
+      {
+        $match: {
+          status: new mongoose.Types.ObjectId('634e59b757b7ea792917962c'),
+        },
+      },
+      {
+        $addFields: {
+          sumPrice: {
+            $sum: '$service.price',
+          },
+        },
+      },
+      {
+        $project: {
+          service: 0,
+          servicesRegistered: 0,
+        },
+      },
+    ]);
+
+    let totalRevenue = 0;
+
+    orders.forEach((item) => {
+      if (item.voucher.length > 0) {
+        const total =
+          item.sumPrice + (item.sumPrice * item.voucher[0].discount) / 100;
+        totalRevenue += total;
+      } else {
+        totalRevenue += item.sumPrice;
+      }
+    });
+
+    const totalOrder = await Order.count().exec();
+
+    res.json({
+      totalUser: users.length,
+      totalOrder,
+      totalRevenue,
+    });
   } catch (error) {
     res.status(400).json({
       message: error.message,
