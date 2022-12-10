@@ -667,3 +667,41 @@ export const getOrderByService = async (req, res) => {
     });
   }
 };
+
+export const adminGetUserOrder = async (req, res) => {
+  try {
+    const { page, userId } = req.query;
+    const limit = 12;
+    const pageSkip = (page - 1) * limit;
+
+    const orders = await Order.find({ userId })
+      .populate({
+        path: 'servicesRegistered.service',
+        model: 'Service',
+      })
+      .populate({
+        path: 'servicesRegistered.staff',
+        model: 'User',
+      })
+      .populate('voucher')
+      .populate('status')
+      .skip(pageSkip)
+      .limit(limit)
+      .sort([['startDate', -1]])
+      .exec();
+
+    const total = await Order.countDocuments({
+      userId,
+    }).exec();
+
+    res.json({
+      total,
+      data: orders,
+      limit,
+    });
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+    });
+  }
+};
