@@ -5,6 +5,7 @@ import User from '../models/user';
 import sendEmail from '../utils/sendEmail';
 import Order from '../models/order';
 import Service from '../models/service';
+import ServiceRating from '../models/serviceRating';
 
 // eslint-disable-next-line import/prefer-default-export
 export const GetoneUser = async (request, response) => {
@@ -454,6 +455,176 @@ export const listOrdered = async (req, response) => {
     response.json(userList);
   } catch (error) {
     return response.status(400).json({
+      message: error.message,
+    });
+  }
+};
+
+export const getListUser = async (req, res) => {
+  try {
+    const { page } = req.query;
+    const limit = 10;
+    const pageSkip = ((page || 1) - 1) * limit;
+    const users = await User.aggregate([
+      {
+        $match: {
+          roleId: new mongoose.Types.ObjectId('636d182beac3f0af67254737'),
+          isBanned: false,
+        },
+      },
+      {
+        $lookup: {
+          from: 'orders',
+          foreignField: 'userId',
+          localField: '_id',
+          as: 'orders',
+        },
+      },
+      {
+        $project: {
+          username: 1,
+          name: 1,
+          birthday: 1,
+          phone: 1,
+          email: 1,
+          isBanned: 1,
+          totalOrder: {
+            $size: '$orders',
+          },
+        },
+      },
+      {
+        $match: {
+          totalOrder: {
+            $gt: 0,
+          },
+        },
+      },
+    ])
+      .skip(pageSkip)
+      .limit(limit);
+
+    const total = await User.aggregate([
+      {
+        $match: {
+          roleId: new mongoose.Types.ObjectId('636d182beac3f0af67254737'),
+          isBanned: false,
+        },
+      },
+      {
+        $lookup: {
+          from: 'orders',
+          foreignField: 'userId',
+          localField: '_id',
+          as: 'orders',
+        },
+      },
+      {
+        $project: {
+          username: 1,
+          name: 1,
+          birthday: 1,
+          phone: 1,
+          email: 1,
+          totalOrder: {
+            $size: '$orders',
+          },
+        },
+      },
+      {
+        $match: {
+          totalOrder: {
+            $gt: 0,
+          },
+        },
+      },
+    ]).count('username');
+
+    res.json({
+      total: total.length > 0 ? total[0].username : 0,
+      data: users,
+    });
+  } catch (error) {
+    return res.status(400).json({
+      message: error.message,
+    });
+  }
+};
+
+export const getUserRevenue = async (req, res) => {
+  try {
+    const { userId } = req.query;
+    const orders = await Order.aggregate([
+      {
+        $match: {
+          status: new mongoose.Types.ObjectId('634e59b757b7ea792917962c'),
+          userId: new mongoose.Types.ObjectId(userId),
+        },
+      },
+      {
+        $lookup: {
+          from: 'services',
+          foreignField: '_id',
+          localField: 'servicesRegistered.service',
+          as: 'service',
+        },
+      },
+      {
+        $lookup: {
+          from: 'vouchers',
+          foreignField: '_id',
+          localField: 'voucher',
+          as: 'voucher',
+        },
+      },
+      {
+        $addFields: {
+          sumPrice: {
+            $sum: '$service.price',
+          },
+        },
+      },
+      {
+        $project: {
+          service: 0,
+          servicesRegistered: 0,
+        },
+      },
+    ]);
+
+    let totalRevenue = 0;
+
+    orders.forEach((item) => {
+      if (item.status.toString() === '634e59b757b7ea792917962c') {
+        if (item.voucher.length > 0) {
+          const total =
+            item.sumPrice + (item.sumPrice * item.voucher[0].discount) / 100;
+          totalRevenue += total;
+        } else {
+          totalRevenue += item.sumPrice;
+        }
+      }
+    });
+
+    res.json(totalRevenue);
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+    });
+  }
+};
+
+export const getUserRated = async (req, res) => {
+  try {
+    const rated = await ServiceRating.find({ userId: req.query.userId })
+      .populate({
+        path: 'serviceId',
+        model: 'Service',
+      })
+      .exec();
+    res.json(rated);
+  } catch (error) {
+    res.status(400).json({
       message: error.message,
     });
   }

@@ -82,6 +82,7 @@ io.on('connection', (socket) => {
     clientId = data;
   });
   socket.on('send-notify', async (data) => {
+    console.log(data);
     const newNotify = await createNotify(data.notifyData);
     io.emit('receive-new-order', data.storeId);
     io.emit('receive-notify', newNotify);
