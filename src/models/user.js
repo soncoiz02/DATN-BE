@@ -31,6 +31,10 @@ const userSchema = new mongoose.Schema(
       required: true,
       minLength: 6,
     },
+    isBanned: {
+      type: Boolean,
+      default: false,
+    },
     avt: {
       type: String,
     },

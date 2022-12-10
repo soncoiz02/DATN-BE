@@ -560,6 +560,11 @@ export const getDashboardStatistic = async (req, res) => {
   try {
     const users = await User.aggregate([
       {
+        $match: {
+          roleId: new mongoose.Types.ObjectId('636d182beac3f0af67254737'),
+        },
+      },
+      {
         $lookup: {
           from: 'orders',
           foreignField: 'userId',
@@ -570,6 +575,7 @@ export const getDashboardStatistic = async (req, res) => {
       {
         $project: {
           item: 1,
+          username: 1,
           totalOrders: {
             $size: '$orders',
           },
@@ -578,11 +584,11 @@ export const getDashboardStatistic = async (req, res) => {
       {
         $match: {
           totalOrders: {
-            $gte: 1,
+            $gt: 0,
           },
         },
       },
-    ]);
+    ]).count('username');
 
     const orders = await Order.aggregate([
       {
@@ -636,7 +642,7 @@ export const getDashboardStatistic = async (req, res) => {
     const totalOrder = await Order.count().exec();
 
     res.json({
-      totalUser: users.length,
+      totalUser: users.length > 0 ? users[0].username : 0,
       totalOrder,
       totalRevenue,
     });

@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import {
+  adminGetUserOrder,
   create,
   filterByStatus,
   filterOrder,
@@ -53,5 +54,7 @@ route.get('/filter-order', filterOrder);
 route.get('/get-order-by-service', getOrderByService);
 
 route.get('/get-user-order', verifyToken, getUserOrder);
+
+route.get('/admin-get-user-order', adminGetUserOrder);
 
 export default route;
