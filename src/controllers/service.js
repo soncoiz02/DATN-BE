@@ -20,7 +20,15 @@ export const create = async (req, res) => {
 
 export const list = async (req, res) => {
   try {
+    const { search } = req.query;
     const services = await Service.aggregate([
+      {
+        $match: {
+          ...(search && {
+            name: { $regex: search, $options: 'i' },
+          }),
+        },
+      },
       {
         $lookup: {
           from: 'serviceratings',

@@ -8,10 +8,24 @@ export const register = async (request, response) => {
   console.log(request.body);
   try {
     const exitUser = await User.findOne({ username }).exec();
+    const existEmail = await User.findOne({ email }).exec();
+    const existPhone = await User.findOne({ phone }).exec();
     if (exitUser) {
       return response.status(400).json({
         field: 'username',
         message: 'Tài khoản đã tồn tại',
+      });
+    }
+    if (existEmail) {
+      return response.status(400).json({
+        field: 'email',
+        message: 'Email đã được đăng ký',
+      });
+    }
+    if (existPhone) {
+      return response.status(400).json({
+        field: 'phone',
+        message: 'Số điện thoại đã được đăng ký',
       });
     }
     const user = await new User({
