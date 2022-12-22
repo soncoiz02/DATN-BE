@@ -50,7 +50,6 @@ export const read = async (request, response) => {
     const category = await Category.findOne({ _id: request.params.id }).exec();
     response.json(category);
   } catch (error) {
-    console.log(error);
     response.status(400).json({
       message: error.message,
     });
@@ -63,7 +62,6 @@ export const getBySlug = async (req, res) => {
     const category = await Category.findOne(condition).exec();
     res.json(category);
   } catch (error) {
-    console.log(error);
     res.status(400).json({
       message: error.message,
     });
@@ -100,7 +98,6 @@ export const update = async (request, response) => {
     ).exec();
     response.json(category);
   } catch (error) {
-    console.log(error);
     response.status(400).json({
       message: error.message,
     });

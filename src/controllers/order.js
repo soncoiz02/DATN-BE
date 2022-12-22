@@ -634,7 +634,7 @@ export const getUserOrder = async (req, res) => {
       .populate('status')
       .skip(pageSkip)
       .limit(limit)
-      .sort([['startDate', -1]])
+      .sort([['createdAt', -1]])
       .exec();
 
     const total = await Order.countDocuments({

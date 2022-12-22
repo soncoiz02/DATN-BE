@@ -4,7 +4,6 @@ import StoreRating from '../models/storeRating';
 export const createStoreRating = async (req, res) => {
   try {
     const storeRating = await new StoreRating(req.body).save();
-    console.log(storeRating);
     res.json(storeRating);
   } catch (error) {
     res.status(400).json({
@@ -52,7 +51,6 @@ export const updateStoreRating = async (req, res) => {
     ).exec();
     res.json(storeRating);
   } catch (error) {
-    console.log(error);
     res.status(400).json({
       message: error.message,
     });

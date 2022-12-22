@@ -12,7 +12,6 @@ export const createStore = async (request, response) => {
     response.json(store);
   } catch (error) {
     response.status(400).json({ message: error.message });
-    console.log(error);
   }
 };
 export const listStore = async (req, res) => {
@@ -57,7 +56,6 @@ export const storeDetail = async (request, response) => {
             rated.length
           ).toFixed(2)
         : 0;
-    console.log(category);
     response.json({
       // eslint-disable-next-line no-underscore-dangle
       ...store._doc,
@@ -105,10 +103,10 @@ export const storeRevenue = async (request, response) => {
     const services = await Service.find().exec();
 
     let _totalRevenue = 0;
-    let _totalOrders = [];
-    let _totalByService = [];
+    const _totalOrders = [];
+    const _totalByService = [];
     services.forEach((service) => {
-      let _item = {};
+      const _item = {};
       _item.serviceId = service._id;
       _item.name = service.name;
       _item.serviceRevenue = 0;
@@ -119,7 +117,7 @@ export const storeRevenue = async (request, response) => {
             if (_totalOrders.indexOf(order._id) < 0) {
               _totalOrders.push(order._id);
             }
-            let actual_price =
+            const actual_price =
               order.voucher === null
                 ? service.price
                 : service.price *

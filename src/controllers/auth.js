@@ -5,7 +5,6 @@ import User from '../models/user';
 export const register = async (request, response) => {
   const { email, username, password, birthday, phone, name, avt, roleId } =
     request.body;
-  console.log(request.body);
   try {
     const exitUser = await User.findOne({ username }).exec();
     const existEmail = await User.findOne({ email }).exec();
@@ -55,7 +54,6 @@ export const register = async (request, response) => {
       },
     });
   } catch (error) {
-    console.log(error);
     response.status(400).json({
       message: error.message,
     });

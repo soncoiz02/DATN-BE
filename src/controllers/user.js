@@ -24,7 +24,6 @@ export const GetoneUser = async (request, response) => {
       roleId: user.roleId,
     });
   } catch (error) {
-    console.log(error);
     response.status(400).json({
       message: error.message,
     });
@@ -84,7 +83,6 @@ export const createRoleUser = async (request, response) => {
     response.json(user);
   } catch (error) {
     response.status(400).json({ message: error.message });
-    console.log(error);
   }
 };
 

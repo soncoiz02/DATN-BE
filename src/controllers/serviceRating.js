@@ -52,7 +52,6 @@ export const updateServeRating = async (req, res) => {
     ).exec();
     res.json(serviceRating);
   } catch (error) {
-    console.log(error);
     res.status(400).json({
       message: error.message,
     });
