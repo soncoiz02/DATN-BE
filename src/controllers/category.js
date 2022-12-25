@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import Category from '../models/category';
 import Service from '../models/service';
 // eslint-disable-next-line import/order
@@ -47,7 +48,19 @@ export const list = async (request, response) => {
 };
 export const read = async (request, response) => {
   try {
-    const category = await Category.findOne({ _id: request.params.id }).exec();
+    const category = await Category.aggregate([
+      {
+        $match: { _id: new mongoose.Types.ObjectId(request.params.id) },
+      },
+      {
+        $lookup: {
+          from: 'services',
+          foreignField: 'categoryId',
+          localField: '_id',
+          as: 'services',
+        },
+      },
+    ]);
     response.json(category);
   } catch (error) {
     response.status(400).json({

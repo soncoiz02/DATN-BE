@@ -123,6 +123,12 @@ export const create = async (req, res) => {
       servicesRegistered.map((service) => handleGetFreeStaff(service))
     );
 
+    if (!data) {
+      return res.status(400).json({
+        message: 'Đặt lịch thất bại',
+      });
+    }
+
     const newOrder = await new Order({
       ...req.body,
       servicesRegistered: data,

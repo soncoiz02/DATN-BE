@@ -107,7 +107,6 @@ export const login = async (request, response) => {
       token,
       user: userData,
     });
-    console.log(userData);
   } catch (error) {
     response.status(400).json({
       message: error.message,
