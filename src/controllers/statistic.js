@@ -325,11 +325,6 @@ export const getServiceRevenue = async (req, res) => {
           as: 'orders',
           pipeline: [
             {
-              $match: {
-                status: new mongoose.Types.ObjectId('634e59b757b7ea792917962c'),
-              },
-            },
-            {
               $lookup: {
                 from: 'vouchers',
                 foreignField: '_id',
@@ -340,6 +335,43 @@ export const getServiceRevenue = async (req, res) => {
           ],
         },
       },
+      {
+        $project: {
+          _id: 1,
+          duration: 1,
+          price: 1,
+          name: 1,
+          totalCancel: {
+            $size: {
+              $filter: {
+                input: '$orders',
+                as: 'totalCancel',
+                cond: {
+                  $eq: [
+                    '$$totalCancel.status',
+                    new mongoose.Types.ObjectId('632bc765dc2a7f68a3f383eb'),
+                  ],
+                },
+              },
+            },
+          },
+          totalDone: {
+            $size: {
+              $filter: {
+                input: '$orders',
+                as: 'totalDone',
+                cond: {
+                  $eq: [
+                    '$$totalDone.status',
+                    new mongoose.Types.ObjectId('634e59b757b7ea792917962c'),
+                  ],
+                },
+              },
+            },
+          },
+          orders: 1,
+        },
+      },
     ]);
 
     const serviceFiltered = [];
@@ -347,13 +379,16 @@ export const getServiceRevenue = async (req, res) => {
     services.forEach((service) => {
       let totalPrice = 0;
       service.orders.forEach((order) => {
-        if (order.voucher.length > 0) {
-          const discount =
-            order.voucher[0].discount / order.servicesRegistered.length;
-          const servicePrice = service.price - (service.price * discount) / 100;
-          totalPrice += servicePrice;
-        } else {
-          totalPrice += service.price;
+        if (order.status.toString() === '634e59b757b7ea792917962c') {
+          if (order.voucher.length > 0) {
+            const discount =
+              order.voucher[0].discount / order.servicesRegistered.length;
+            const servicePrice =
+              service.price - (service.price * discount) / 100;
+            totalPrice += servicePrice;
+          } else {
+            totalPrice += service.price;
+          }
         }
       });
 
@@ -361,6 +396,8 @@ export const getServiceRevenue = async (req, res) => {
         total: totalPrice,
         countUsed: service.orders.length,
         service,
+        totalDone: service.totalDone,
+        totalCancel: service.totalCancel,
       });
     });
 
@@ -646,6 +683,139 @@ export const getDashboardStatistic = async (req, res) => {
       totalOrder,
       totalRevenue,
     });
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+    });
+  }
+};
+
+export const UserStatistic = async (req, res) => {
+  try {
+    const users = await User.aggregate([
+      {
+        $match: {
+          roleId: new mongoose.Types.ObjectId('636d182beac3f0af67254737'),
+          isBanned: false,
+        },
+      },
+      {
+        $lookup: {
+          from: 'orders',
+          foreignField: 'userId',
+          localField: '_id',
+          as: 'orders',
+          pipeline: [
+            {
+              $lookup: {
+                from: 'services',
+                foreignField: '_id',
+                localField: 'servicesRegistered.service',
+                as: 'service',
+              },
+            },
+            {
+              $lookup: {
+                from: 'vouchers',
+                foreignField: '_id',
+                localField: 'voucher',
+                as: 'voucher',
+              },
+            },
+            {
+              $addFields: {
+                sumPrice: {
+                  $sum: '$service.price',
+                },
+              },
+            },
+            {
+              $project: {
+                service: 0,
+                servicesRegistered: 0,
+              },
+            },
+          ],
+        },
+      },
+      {
+        $project: {
+          username: 1,
+          name: 1,
+          birthday: 1,
+          phone: 1,
+          email: 1,
+          isBanned: 1,
+          orders: 1,
+          totalOrder: {
+            $size: '$orders',
+          },
+          totalDone: {
+            $size: {
+              $filter: {
+                input: '$orders',
+                as: 'totalDone',
+                cond: {
+                  $eq: [
+                    '$$totalDone.status',
+                    new mongoose.Types.ObjectId('634e59b757b7ea792917962c'),
+                  ],
+                },
+              },
+            },
+          },
+          totalCancel: {
+            $size: {
+              $filter: {
+                input: '$orders',
+                as: 'totalCancel',
+                cond: {
+                  $eq: [
+                    '$$totalCancel.status',
+                    new mongoose.Types.ObjectId('632bc765dc2a7f68a3f383eb'),
+                  ],
+                },
+              },
+            },
+          },
+        },
+      },
+      {
+        $match: {
+          totalOrder: {
+            $gt: 0,
+          },
+        },
+      },
+    ]);
+
+    const totalRevenueEachUser = users
+      .map((user) => {
+        let totalRevenue = 0;
+
+        user.orders.forEach((item) => {
+          if (item.status.toString() === '634e59b757b7ea792917962c') {
+            if (item.voucher.length > 0) {
+              const total =
+                item.sumPrice +
+                (item.sumPrice * item.voucher[0].discount) / 100;
+              totalRevenue += total;
+            } else {
+              totalRevenue += item.sumPrice;
+            }
+          }
+        });
+
+        delete user.orders;
+
+        return {
+          ...user,
+          totalRevenue,
+        };
+      })
+      .sort((a, b) => b.totalRevenue - a.totalRevenue);
+
+    res.json(totalRevenueEachUser);
   } catch (error) {
     res.status(400).json({
       message: error.message,

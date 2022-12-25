@@ -40,7 +40,8 @@ const app = express();
 const server = http.createServer(app);
 dotenv.config();
 
-const io = new Server(server, {
+// eslint-disable-next-line import/prefer-default-export
+export const io = new Server(server, {
   cors: {
     origin: '*',
     methods: ['GET, POST'],

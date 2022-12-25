@@ -26,7 +26,6 @@ export const read = async (request, response) => {
     const postComment = await Postcomment.findOne(condition).exec();
     response.json(postComment);
   } catch (error) {
-    console.log(error);
     response.status(400).json({
       message: error.message,
     });

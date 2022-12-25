@@ -12,12 +12,7 @@ const voucherSchema = new Schema(
       type: Number,
       required: true,
     },
-
     description: {
-      type: String,
-      required: true,
-    },
-    subject: {
       type: String,
       required: true,
     },
@@ -31,7 +26,7 @@ const voucherSchema = new Schema(
     },
     isUsed: {
       type: Boolean,
-      required: true,
+      default: false,
     },
     userId: {
       type: ObjectId,

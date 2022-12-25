@@ -123,6 +123,12 @@ export const create = async (req, res) => {
       servicesRegistered.map((service) => handleGetFreeStaff(service))
     );
 
+    if (!data) {
+      return res.status(400).json({
+        message: 'Đặt lịch thất bại',
+      });
+    }
+
     const newOrder = await new Order({
       ...req.body,
       servicesRegistered: data,
@@ -634,7 +640,7 @@ export const getUserOrder = async (req, res) => {
       .populate('status')
       .skip(pageSkip)
       .limit(limit)
-      .sort([['startDate', -1]])
+      .sort([['createdAt', -1]])
       .exec();
 
     const total = await Order.countDocuments({

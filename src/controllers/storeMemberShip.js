@@ -4,7 +4,6 @@ import StoreMemberShip from '../models/storeMemberShip';
 export const createStoreMemberShip = async (req, res) => {
   try {
     const storeMemberShip = await new StoreMemberShip(req.body).save();
-    console.log(storeMemberShip);
     res.json(storeMemberShip);
   } catch (error) {
     res.status(400).json({
@@ -49,7 +48,6 @@ export const updateStoreMemberShip = async (req, res) => {
     ).exec();
     res.json(storeMemberShip);
   } catch (error) {
-    console.log(error);
     res.status(400).json({
       message: error.message,
     });

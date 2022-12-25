@@ -9,7 +9,6 @@ export const create = async (request, response) => {
     response.json(userNotify);
   } catch (error) {
     response.status(400).json({ message: error.message });
-    console.log(error);
   }
 };
 export const list = async (request, response) => {
